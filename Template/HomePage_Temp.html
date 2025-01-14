@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TechNest</title>
+        <link rel="stylesheet" href="{% CSSFILE %}" />
+    </head>
+    <body>
+        <header>
+            <div>
+                <img src="" alt="" />
+                <h1 id="title_h1">TechNest</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Cart</a></li>
+                    <li><a href="#">MyShop</a></li>
+                    <li><a href="#">{% USER %}</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section id="face">
+                <h1>TechNest</h1>
+                <div id="face_div1_1">
+                    <input type="text" />
+                    <button type="submit">Search</button>
+                </div>
+            </section>
+            <section id="product">{% PRODUCTS %}</section>
+        </main>
+        <footer>
+            <div id="footer_div1_1">
+                <div class="footer_div2">
+                    <p>Pages</p>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Cart</a></li>
+                        <li><a href="#">MyShop</a></li>
+                        <li><a href="#">{% USER %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer_div2">
+                    <p>Contact</p>
+                    <ul>
+                        <li>FaceBook</li>
+                        <li>Instagram</li>
+                        <li>Email:abc@abc</li>
+                        <li>Policy</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="footer_div1_2">
+                <p>Copyright© 2025 TechNest. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
