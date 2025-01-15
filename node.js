@@ -5,7 +5,10 @@ const fs = require("fs");
 
 //router
 const server = http.createServer((req, res) => {
-    if (req.url === "/" || req.url === "/home") {
+    const parsedUrl = url.parse(req.url, true);
+    console.log(parsedUrl);
+    //homepage
+    if (parsedUrl.pathname === "/" || parsedUrl.pathname === "/home") {
         fs.readFile("./Template/HomePage_Temp.html", (err, data) => {
             const output = data.toString().replace("{% CSSFILE %}", `Template\\css.css`);
 
@@ -14,13 +17,21 @@ const server = http.createServer((req, res) => {
             res.writeHead(200);
             res.end(output);
         });
-    } else if (req.url === "/cart") {
+
+        //cart
+    } else if (parsedUrl.pathname === "/cart") {
         res.end("Cart");
-    } else if (req.url === "/market") {
+
+        //market
+    } else if (parsedUrl.pathname === "/myshop") {
         res.end("Market");
-    } else if (req.url === "/setting") {
+
+        //setting
+    } else if (parsedUrl.pathname === "/setting") {
         res.end("Setting");
-    } else if (req.url === "/Template/css.css") {
+
+        //css
+    } else if (parsedUrl.pathname === "/Template/css.css") {
         fs.readFile("./Template/css.css", (err, data) => {
             const output = data.toString();
 
@@ -29,7 +40,14 @@ const server = http.createServer((req, res) => {
             res.end(output);
         });
     } else {
-        res.end("404");
+        fs.readFile("./Template/404.html", (err, data) => {
+            const output = data.toString().replace("{% CSSFILE %}", `Template\\css.css`);
+
+            //console.log(output);
+            res.setHeader("Content-Type", "text/html");
+            res.writeHead(404);
+            res.end(output);
+        });
     }
     console.log(req.url);
 });
