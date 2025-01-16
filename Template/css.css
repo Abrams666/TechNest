@@ -39,7 +39,7 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-header div {
+header a {
     width: auto;
     height: auto;
     display: flex;
@@ -47,7 +47,7 @@ header div {
     align-items: center;
     justify-content: center;
 }
-#title_h1 {
+.title_h1 {
     font-size: 2vw;
 }
 nav {
@@ -74,7 +74,7 @@ section {
 #face {
     height: 100vh;
     width: 100%;
-    background-image: url(Server_Picture/circuit-board-background-technology-3d-rendered-design_9716991.jpg);
+    background-image: url(/img/001.jpg);
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -132,7 +132,7 @@ section {
 #face-down {
     position: absolute;
     left: 50%;
-    top: 95%;
+    top: 92%;
     font-size: x-large;
     padding-left: -25%;
 }

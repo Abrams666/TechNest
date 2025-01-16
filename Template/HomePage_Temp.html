@@ -4,16 +4,16 @@
         <title>TechNest</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="css.css" />
+        <link rel="stylesheet" href="{% CSS_FILE %}" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
         <header>
-            <div>
+            <a href="/home">
                 <img src="" alt="" />
-                <h1 id="title_h1">Tech</h1>
-                <h1 style="color: rgb(1, 215, 1)">Nest</h1>
-            </div>
+                <h1 class="title_h1">Tech</h1>
+                <h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
+            </a>
             <nav>
                 <ul>
                     <li>
@@ -43,19 +43,7 @@
                     <i id="face-down" class="fa-solid fa-chevron-down fa-bounce"></i>
                 </div>
             </section>
-            <section id="product">
-                <div class="cards">
-                    <div class="product_top">
-                        <img src="Server_Picture/PCB-hero-image-v2.webp" alt="" />
-                        <p class="product_name">{% PRODUCT_NAME %}</p>
-                        <p class="product_description">{% PRODUCT_DESCRIPTION %}</p>
-                    </div>
-                    <div class="product_bottom">
-                        <p>${% PRODUCT_PICE %}</p>
-                        <a href="{% PRODUCT_LINK %}">Details...</a>
-                    </div>
-                </div>
-            </section>
+            <section id="product">{% PRODUCTS %}</section>
         </main>
         <footer>
             <div id="footer_div1_1">
