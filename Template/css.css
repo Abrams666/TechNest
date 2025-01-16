@@ -1,5 +1,5 @@
 :root {
-    --Green: rgb(1, 215, 1);
+    --Green: rgb(0, 216, 0);
     --Light-Gray: rgb(66, 66, 66);
     --Gray: rgb(33, 33, 33);
 }
@@ -26,7 +26,7 @@ body {
 }
 header {
     width: 98%;
-    height: auto;
+    height: 8vh;
     z-index: 100;
     padding: 1%;
     border-bottom: var(--Green) 3px solid;
@@ -144,10 +144,11 @@ section {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: space-around;
     gap: 20px;
 }
 .cards {
-    width: 20%;
+    width: 18%;
     min-width: 200px;
     height: auto;
     padding: 20px;
@@ -209,6 +210,82 @@ section {
 }
 .product_bottom a:hover {
     background-color: rgb(0, 255, 0);
+}
+#details {
+    width: 90%;
+    height: 80vh;
+    padding: 5%;
+    padding-top: 17vh;
+    padding-bottom: 3vh;
+    background-color: var(--Light-Gray);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+}
+#details_img {
+    width: 40%;
+    height: auto;
+}
+#details_img img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+#details_texts {
+    width: 50%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+    gap: 10px;
+}
+#details_top {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    gap: 20px;
+}
+#details_bottom {
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+#details_texts h3 {
+    font-size: 4vw;
+}
+#details_details {
+    font-size: x-large;
+    color: rgb(188, 188, 188);
+}
+#details_price {
+    font-size: x-large;
+}
+#details_texts button {
+    width: 40%;
+    height: 100%;
+    clip-path: polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%);
+    padding: 5px;
+    font-size: large;
+    background-color: var(--Green);
+    color: black;
+}
+#details_texts button:hover {
+    background-color: rgb(0, 255, 0);
+}
+#recommadation {
+    width: 90%;
+    height: auto;
+    padding: 5%;
+    background-color: var(--Gray);
 }
 footer {
     width: 94%;
