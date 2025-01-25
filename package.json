@@ -1,0 +1,26 @@
+{
+  "name": "online_shop",
+  "version": "0.3.2",
+  "description": "A website which sell products",
+  "main": "node.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abrams666/Online_Shop.git"
+  },
+  "author": "Abrams",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abrams666/Online_Shop/issues"
+  },
+  "homepage": "https://github.com/Abrams666/Online_Shop#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "slugify": "^1.6.6"
+  }
+}
