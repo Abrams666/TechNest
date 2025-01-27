@@ -133,7 +133,7 @@ app.get("/signup", (req, res) => {
 app.get("/success/:obj", (req, res) => {
     const obj = req.params.obj;
 
-    let output = replacement(login, ["{% CSS_FILE %}", "{% OBJECT %}"], ["/css", obj]);
+    let output = replacement(success, ["{% CSS_FILE %}", "{% OBJECT %}"], ["/css", obj]);
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -195,7 +195,7 @@ app.get("/css", (req, res) => {
 app.get("/js/:filename", (req, res) => {
     const filename = req.params.filename;
 
-    fs.readFile(`./Database/${filename}.js`, (err, data) => {
+    fs.readFile(`./Template/${filename}.js`, (err, data) => {
         res.writeHead(200, { "Content-Type": "text/javascript" });
         res.end(data);
     });
