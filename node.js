@@ -5,8 +5,10 @@ const fs = require("fs");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 //config
 dotenv.config({ path: "./config.env" });
@@ -102,6 +104,7 @@ const not_found = fs.readFileSync("./Template/404.html", "utf8");
 app.get("/", (req, res) => {
     let output = replacement(home_page, ["{% CSS_FILE %}"], ["/css"]);
 
+    res.cookie("test", "test", { httpOnly: true, maxAge: 86400000 });
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
     res.end(output);
@@ -154,6 +157,8 @@ app.post("/logindata", (req, res) => {
             } else if (result.length === 1 && result[0].password !== data.pwd) {
                 res.status(403).json({ message: "Wrong Password" });
             } else if (result.length === 1 && result[0].password === data.pwd) {
+                res.cookie("id", result[0].id.toString(), { httpOnly: true, maxAge: 86400000 });
+                res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
                 res.status(200).json({ message: "Login success" });
             }
         });
@@ -184,6 +189,8 @@ app.post("/signupdata", (req, res) => {
                         });
 
                         newAccount.save().then(() => {
+                            res.cookie("id", (result2[0].id + 1).toString(), { httpOnly: true, maxAge: 86400000 });
+                            res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
                             res.status(201).json({ message: "Signup success" });
                         });
                     });
