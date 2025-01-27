@@ -104,6 +104,12 @@ const not_found = fs.readFileSync("./Template/404.html", "utf8");
 app.get("/", (req, res) => {
     let output = replacement(home_page, ["{% CSS_FILE %}"], ["/css"]);
 
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    } else {
+        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
+    }
+
     res.cookie("test", "test", { httpOnly: true, maxAge: 86400000 });
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -112,6 +118,12 @@ app.get("/", (req, res) => {
 
 app.get("/product/:id", (req, res) => {
     let output = replacement(product, ["{% CSS_FILE %}"], ["/css"]);
+
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    } else {
+        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
+    }
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -158,6 +170,7 @@ app.post("/logindata", (req, res) => {
                 res.status(403).json({ message: "Wrong Password" });
             } else if (result.length === 1 && result[0].password === data.pwd) {
                 res.cookie("id", result[0].id.toString(), { httpOnly: true, maxAge: 86400000 });
+                res.cookie("name", result[0].name, { httpOnly: true, maxAge: 86400000 });
                 res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
                 res.status(200).json({ message: "Login success" });
             }
@@ -190,6 +203,7 @@ app.post("/signupdata", (req, res) => {
 
                         newAccount.save().then(() => {
                             res.cookie("id", (result2[0].id + 1).toString(), { httpOnly: true, maxAge: 86400000 });
+                            res.cookie("name", data.name, { httpOnly: true, maxAge: 86400000 });
                             res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
                             res.status(201).json({ message: "Signup success" });
                         });
@@ -247,6 +261,12 @@ app.get("/img/pro/:id/:num", (req, res) => {
 //404
 app.use((req, res) => {
     let output = replacement(not_found, ["{% CSS_FILE %}"], ["/css"]);
+
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    } else {
+        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
+    }
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(404);
