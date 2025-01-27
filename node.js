@@ -13,7 +13,7 @@ dotenv.config({ path: "./config.env" });
 //db connect
 const DCS = process.env.DATABASE_CONNECTION_STRING.replace("<db_password>", process.env.DATABASE_PASSWORD);
 mongoose
-    .connect("mongodb+srv://Abrams:fzTz4fxcGwsuLEan@cluster0.siulj.mongodb.net/TechNest?retryWrites=true&w=majority&appName=Cluster0", {
+    .connect(DCS, {
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,
@@ -92,6 +92,9 @@ const css = fs.readFileSync("./Template/css.css", "utf8");
 const home_page = fs.readFileSync("./Template/HomePage_Temp.html", "utf8");
 const home_page_card = fs.readFileSync("./Template/HomePageCard_Temp.html", "utf8");
 const product = fs.readFileSync("./Template/Product_Temp.html", "utf8");
+const login = fs.readFileSync("./Template/Login_Temp.html", "utf8");
+const signup = fs.readFileSync("./Template/SignUp_Temp.html", "utf8");
+const success = fs.readFileSync("./Template/Success.html", "utf8");
 const not_found = fs.readFileSync("./Template/404.html", "utf8");
 
 //give page
@@ -111,6 +114,76 @@ app.get("/product/:id", (req, res) => {
     res.end(output);
 });
 
+app.get("/login", (req, res) => {
+    let output = replacement(login, ["{% CSS_FILE %}"], ["/css"]);
+
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead(200);
+    res.end(output);
+});
+
+app.get("/signup", (req, res) => {
+    let output = replacement(signup, ["{% CSS_FILE %}"], ["/css"]);
+
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead(200);
+    res.end(output);
+});
+
+app.get("/success/:obj", (req, res) => {
+    const obj = req.params.obj;
+
+    let output = replacement(login, ["{% CSS_FILE %}", "{% OBJECT %}"], ["/css", obj]);
+
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead(200);
+    res.end(output);
+});
+//deal with data
+app.get("/logindata", (req, res) => {
+    const data = req.body;
+
+    user_model
+        .find({
+            id: data.acc,
+            password: data.pwd,
+        })
+        .then((result) => {
+            if (result.length === 0) {
+                res.status(401).json({ message: "No user found" });
+            } else if (result.length === 1) {
+                res.status(200).json({ message: "Login success" });
+            }
+        });
+});
+app.post("/signupdata", (req, res) => {
+    const data = req.body;
+
+    user_model
+        .find({
+            id: data.acc,
+        })
+        .then((result) => {
+            if (result.length === 0) {
+                const newAccount = new user_model({
+                    id: data.acc,
+                    password: data.pwd,
+                    name: data.name,
+                    email: data.email,
+                    shop_name: data.shop_name,
+                    cart_product: [],
+                    my_product: [],
+                });
+
+                newAccount.save().then(() => {
+                    res.redirect(201, "/success/SignUp");
+                });
+            } else {
+                res.status(409).json({ message: "Account already exists" });
+            }
+        });
+});
+
 //give css
 app.get("/css", (req, res) => {
     res.setHeader("Content-Type", "text/css");
@@ -118,11 +191,22 @@ app.get("/css", (req, res) => {
     res.end(css);
 });
 
+//give js
+app.get("/js/:filename", (req, res) => {
+    const filename = req.params.filename;
+
+    fs.readFile(`./Database/${filename}.js`, (err, data) => {
+        res.writeHead(200, { "Content-Type": "text/javascript" });
+        res.end(data);
+    });
+});
+
 //give img
-app.get("/img/sys/:id", (req, res) => {
+app.get("/img/sys/:id/:type", (req, res) => {
     const id = req.params.id;
-    fs.readFile(`./Database/Server_Picture/${id}.jpg`, (err, data) => {
-        res.writeHead(200, { "Content-Type": "image/jpg" });
+    const type = req.params.type;
+    fs.readFile(`./Database/Server_Picture/${id}.${type}`, (err, data) => {
+        res.writeHead(200, { "Content-Type": `image/${type}` });
         res.end(data);
     });
 });
