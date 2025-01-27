@@ -9,8 +9,11 @@ const app = Vue.createApp({
     },
     methods: {
         login() {
+            this.ACCOUNT_ERR = "";
+            this.PASSWORD_ERR = "";
+
             fetch("/logindata", {
-                method: "GET",
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -19,11 +22,13 @@ const app = Vue.createApp({
                     pwd: this.pwd,
                 }),
             })
-                .then((response) => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else {
-                        return response.json();
+                .then((res) => {
+                    if (res.status === 200) {
+                        window.location.href = "success/Login";
+                    } else if (res.status === 401) {
+                        this.ACCOUNT_ERR = "Email not found.";
+                    } else if (res.status === 403) {
+                        this.PASSWORD_ERR = "Wrong password.";
                     }
                 })
                 .catch((error) => console.error("Error:", error));

@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 //config
 dotenv.config({ path: "./config.env" });
@@ -140,18 +141,19 @@ app.get("/success/:obj", (req, res) => {
     res.end(output);
 });
 //deal with data
-app.get("/logindata", (req, res) => {
+app.post("/logindata", (req, res) => {
     const data = req.body;
 
     user_model
         .find({
-            id: data.acc,
-            password: data.pwd,
+            email: data.acc,
         })
         .then((result) => {
             if (result.length === 0) {
-                res.status(401).json({ message: "No user found" });
-            } else if (result.length === 1) {
+                res.status(401).json({ message: "User not found" });
+            } else if (result.length === 1 && result[0].password !== data.pwd) {
+                res.status(403).json({ message: "Wrong Password" });
+            } else if (result.length === 1 && result[0].password === data.pwd) {
                 res.status(200).json({ message: "Login success" });
             }
         });
@@ -159,25 +161,32 @@ app.get("/logindata", (req, res) => {
 app.post("/signupdata", (req, res) => {
     const data = req.body;
 
+    console.log(data);
+
     user_model
         .find({
-            id: data.acc,
+            email: data.acc,
         })
         .then((result) => {
             if (result.length === 0) {
-                const newAccount = new user_model({
-                    id: data.acc,
-                    password: data.pwd,
-                    name: data.name,
-                    email: data.email,
-                    shop_name: data.shop_name,
-                    cart_product: [],
-                    my_product: [],
-                });
+                user_model
+                    .find()
+                    .sort({ quantity: -1 })
+                    .then((result2) => {
+                        const newAccount = new user_model({
+                            id: result2[0].id + 1,
+                            password: data.pwd,
+                            name: data.name,
+                            email: data.acc,
+                            shop_name: data.shop_name,
+                            cart_product: [],
+                            my_product: [],
+                        });
 
-                newAccount.save().then(() => {
-                    res.redirect(201, "/success/SignUp");
-                });
+                        newAccount.save().then(() => {
+                            res.status(201).json({ message: "Signup success" });
+                        });
+                    });
             } else {
                 res.status(409).json({ message: "Account already exists" });
             }

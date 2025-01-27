@@ -78,8 +78,8 @@ const app = Vue.createApp({
                     }),
                 })
                     .then((res) => {
-                        if (res.redirected) {
-                            window.location.href = res.url;
+                        if (res.status === 201) {
+                            window.location.href = "success/Sign_Up";
                         } else if (res.status === 409) {
                             this.ACCOUNT_ERR = "Email already exists.";
                         }
