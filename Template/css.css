@@ -16,6 +16,9 @@
 ::-webkit-scrollbar {
     display: none;
 }
+button:hover {
+    background-color: rgb(0, 255, 0);
+}
 html {
     width: 100vw;
     height: auto;
@@ -463,6 +466,167 @@ footer {
     align-items: start;
     justify-content: center;
     gap: 10%;
+}
+#setting_sec {
+    width: 100%;
+    height: auto;
+    padding-top: 20vh;
+    padding-bottom: 10vh;
+    background-color: var(--Gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#setting_form {
+    width: 70%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.setting_tr {
+    width: 100%;
+    height: auto;
+    border-bottom: var(--Gray) solid 10px;
+    background-color: var(--Light-Gray);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.setting_th_title {
+    width: 30%;
+    height: auto;
+    font-size: x-large;
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: center;
+}
+.setting_th_contain {
+    width: 65%;
+    height: auto;
+    padding: 20px;
+    border-left: var(--Gray) solid 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.setting_div {
+    width: 80%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+}
+.setting_div input {
+    width: auto;
+    height: 20px;
+    padding: 5px;
+    border: none;
+    color: var(--Green);
+    border-bottom: 1px solid var(--Green);
+    background-color: var(--Gray);
+    font-size: larger;
+}
+.setting_btn {
+    width: 80%;
+    height: 40px;
+    color: var(--Gray);
+    background-color: var(--Green);
+    clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+    font-size: medium;
+}
+.setting_btn:hover {
+    background-color: rgb(0, 255, 0);
+}
+#danger_btn {
+    background-color: red;
+    color: white;
+}
+.check_div {
+    width: 40vw;
+    height: auto;
+    border: var(--Green) 3px solid;
+    background-color: var(--Gray);
+    position: fixed;
+    top: 50vh;
+    left: 30vw;
+    margin-top: -5%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.check_close {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: end;
+}
+.close_btn {
+    width: 10%;
+    height: 30px;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 20% 100%);
+    background-color: var(--Green);
+    font-size: medium;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--Gray);
+    cursor: pointer;
+}
+.check_contain {
+    width: 80%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    gap: 10px;
+}
+.check_contain p {
+    font-size: medium;
+}
+.check_contain div {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+}
+.check_contain input {
+    width: 100%;
+    height: 20px;
+    padding: 5px;
+    border-bottom: var(--Green) solid 1px;
+    background-color: var(--Light-Gray);
+    font-size: medium;
+}
+.check_submit {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.check_submit button {
+    width: 50%;
+    height: 40px;
+    clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+    background-color: var(--Green);
+    font-size: medium;
 }
 .footer_div2 {
     width: auto;

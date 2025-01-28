@@ -60,7 +60,7 @@ const product_schema = new mongoose.Schema(
 );
 
 const user_model = mongoose.model("user_model", user_schema);
-const product_model = mongoose.model("product_model", user_schema);
+const product_model = mongoose.model("product_model", product_schema);
 
 // const newItem = new user_model({
 //     id: 2,
@@ -110,13 +110,32 @@ app.get("/", (req, res) => {
         output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
     }
 
-    res.cookie("test", "test", { httpOnly: true, maxAge: 86400000 });
-    res.setHeader("Content-Type", "text/html");
-    res.writeHead(200);
-    res.end(output);
+    product_model
+        .find()
+        .sort({ quantity: -1 })
+        .then((result) => {
+            let max_product_num = 20;
+            let cards = "";
+
+            if (result.length < max_product_num) {
+                max_product_num = result.length;
+            }
+
+            for (let i = 0; i < max_product_num; i++) {
+                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}"], [`/img/pro/${result[i].id}/1`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}`]);
+            }
+
+            output = replacement(output, ["{% PRODUCTS %}"], [cards]);
+
+            res.setHeader("Content-Type", "text/html");
+            res.writeHead(200);
+            res.end(output);
+        });
 });
 
 app.get("/product/:id", (req, res) => {
+    const id = req.params.id;
+
     let output = replacement(product, ["{% CSS_FILE %}"], ["/css"]);
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
@@ -125,9 +144,17 @@ app.get("/product/:id", (req, res) => {
         output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
     }
 
-    res.setHeader("Content-Type", "text/html");
-    res.writeHead(200);
-    res.end(output);
+    product_model
+        .find({
+            id: id,
+        })
+        .then((result) => {
+            output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}"], [`/img/pro/${id}/1`, result[0].name, result[0].detail, result[0].owner, result[0].price]);
+
+            res.setHeader("Content-Type", "text/html");
+            res.writeHead(200);
+            res.end(output);
+        });
 });
 
 app.get("/login", (req, res) => {
