@@ -97,6 +97,7 @@ const home_page_card = fs.readFileSync("./Template/HomePageCard_Temp.html", "utf
 const product = fs.readFileSync("./Template/Product_Temp.html", "utf8");
 const myshop = fs.readFileSync("./Template/My_Shop.html", "utf8");
 const edit = fs.readFileSync("./Template/Edit_Product_Temp.html", "utf8");
+const setting = fs.readFileSync("./Template/Setting_Temp.html", "utf8");
 const login = fs.readFileSync("./Template/Login_Temp.html", "utf8");
 const signup = fs.readFileSync("./Template/SignUp_Temp.html", "utf8");
 const success = fs.readFileSync("./Template/Success.html", "utf8");
@@ -167,9 +168,9 @@ app.get("/editproduct/:id", (req, res) => {
         let output = replacement(edit, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
 
         if (id === "N") {
-            res.cookie("edit_type", "New", { httpOnly: true, maxAge: 86400000 });
+            res.cookie("edit_type", "New", { maxAge: 86400000 });
         } else {
-            res.cookie("edit_type", id, { httpOnly: true, maxAge: 86400000 });
+            res.cookie("edit_type", id, { maxAge: 86400000 });
         }
 
         res.setHeader("Content-Type", "text/html");
@@ -202,6 +203,19 @@ app.get("/myshop", (req, res) => {
         });
     } else {
         res.writeHead(302, { Location: "/login" });
+        res.end();
+    }
+});
+
+app.get("/setting/:a", (req, res) => {
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        let output = replacement(setting, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+
+        res.setHeader("Content-Type", "text/html");
+        res.writeHead(200);
+        res.end(output);
+    } else {
+        res.writeHead(302, { Location: "/fail/Access Denied/401" });
         res.end();
     }
 });
@@ -257,10 +271,10 @@ app.post("/logindata", (req, res) => {
             } else if (result.length === 1 && result[0].password !== data.pwd) {
                 res.status(403).json({ message: "Wrong Password" });
             } else if (result.length === 1 && result[0].password === data.pwd) {
-                res.cookie("id", result[0].id.toString(), { httpOnly: true, maxAge: 86400000 });
-                res.cookie("name", result[0].name, { httpOnly: true, maxAge: 86400000 });
-                res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
-                res.cookie("shop_name", data.shop_name, { httpOnly: true, maxAge: 86400000 });
+                res.cookie("id", result[0].id.toString(), { maxAge: 86400000 });
+                res.cookie("name", result[0].name, { maxAge: 86400000 });
+                res.cookie("au4a83", data.pwd, { maxAge: 86400000 });
+                res.cookie("shop_name", result[0].shop_name, { maxAge: 86400000 });
                 res.status(200).json({ message: "Login success" });
             }
         });
@@ -285,15 +299,16 @@ app.post("/signupdata", (req, res) => {
                             password: data.pwd,
                             name: data.name,
                             email: data.acc,
-                            shop_name: data.shop_name,
+                            shop_name: data.shop,
                             cart_product: [],
                             my_product: [],
                         });
 
                         newAccount.save().then(() => {
-                            res.cookie("id", (result2[0].id + 1).toString(), { httpOnly: true, maxAge: 86400000 });
-                            res.cookie("name", data.name, { httpOnly: true, maxAge: 86400000 });
-                            res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
+                            res.cookie("id", (result2[0].id + 1).toString(), { maxAge: 86400000 });
+                            res.cookie("name", data.name, { maxAge: 86400000 });
+                            res.cookie("au4a83", data.pwd, { maxAge: 86400000 });
+                            res.cookie("shop_name", data.shop, { maxAge: 86400000 });
                             res.status(201).json({ message: "Signup success" });
                         });
                     });

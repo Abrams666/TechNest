@@ -4,7 +4,7 @@
         <title>TechNest</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="css.css" />
+        <link rel="stylesheet" href="/css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
     <body>
@@ -20,10 +20,10 @@
                         <a href="/"><i class="fa-solid fa-house"></i> Home</a>
                     </li>
                     <li>
-                        <a href="cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+                        <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
                     </li>
                     <li>
-                        <a href="myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
+                        <a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
                     </li>
                     <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
                 </ul>
@@ -43,7 +43,7 @@
                         <div class="setting_th_contain">
                             <div class="setting_div">
                                 <p>Password:</p>
-                                <input type="password" v-mode="pwd" />
+                                <input type="password" v-model="pwd" />
                             </div>
                             <button class="setting_btn" v-on:click.prevent="change_pwd()">Update</button>
                         </div>
@@ -53,11 +53,11 @@
                         <div class="setting_th_contain">
                             <div class="setting_div">
                                 <p>Your Name:</p>
-                                <input type="text" v-mode="name" />
+                                <input type="text" v-model="name" />
                             </div>
                             <div class="setting_div">
                                 <p>Shop Name:</p>
-                                <input type="text" v-mode="shop" />
+                                <input type="text" v-model="shop" />
                             </div>
                             <button class="setting_btn" v-on:click.prevent="change_info()">Update</button>
                         </div>
@@ -77,14 +77,14 @@
                                 <p>Old Password:</p>
                                 <p class="err_text">{{ OLD_PASS_ERR }}</p>
                             </div>
-                            <input type="password" v-mode="old_pwd" />
+                            <input type="password" v-model="old_pwd" />
                         </div>
                         <div class="check_contain">
                             <div>
                                 <p>Confirm New Password:</p>
                                 <p class="err_text">{{ CON_PASS_ERR }}</p>
                             </div>
-                            <input type="password" v-mode="con_pwd" />
+                            <input type="password" v-model="con_pwd" />
                         </div>
                         <div class="check_submit">
                             <button v-on:click.prevent="check_pwd_submit()">Submit</button>
@@ -120,6 +120,6 @@
             </div>
         </footer>
         <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
-        <script src="Setting.js"></script>
+        <script src="/js/Setting"></script>
     </body>
 </html>

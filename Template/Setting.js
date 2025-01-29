@@ -5,6 +5,8 @@ const app = Vue.createApp({
         return {
             ACCOUNT_ERR: "",
             PASSWORD_ERR: "",
+            CON_PASS_ERR: "",
+            OLD_PASS_ERR: "",
             pwd: "",
             name: "",
             shop: "",
@@ -14,6 +16,8 @@ const app = Vue.createApp({
     },
     methods: {
         logout() {
+            //console.log("clicked");
+
             document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "au4a83=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
