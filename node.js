@@ -95,9 +95,12 @@ const css = fs.readFileSync("./Template/css.css", "utf8");
 const home_page = fs.readFileSync("./Template/HomePage_Temp.html", "utf8");
 const home_page_card = fs.readFileSync("./Template/HomePageCard_Temp.html", "utf8");
 const product = fs.readFileSync("./Template/Product_Temp.html", "utf8");
+const myshop = fs.readFileSync("./Template/My_Shop.html", "utf8");
+const edit = fs.readFileSync("./Template/Edit_Product_Temp.html", "utf8");
 const login = fs.readFileSync("./Template/Login_Temp.html", "utf8");
 const signup = fs.readFileSync("./Template/SignUp_Temp.html", "utf8");
 const success = fs.readFileSync("./Template/Success.html", "utf8");
+const fail = fs.readFileSync("./Template/Fail.html", "utf8");
 const not_found = fs.readFileSync("./Template/404.html", "utf8");
 
 //give page
@@ -112,7 +115,7 @@ app.get("/", (req, res) => {
 
     product_model
         .find()
-        .sort({ quantity: -1 })
+        .sort({ id: -1 })
         .then((result) => {
             let max_product_num = 20;
             let cards = "";
@@ -122,7 +125,7 @@ app.get("/", (req, res) => {
             }
 
             for (let i = 0; i < max_product_num; i++) {
-                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}"], [`/img/pro/${result[i].id}/1`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}`]);
+                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}`, "View More..."]);
             }
 
             output = replacement(output, ["{% PRODUCTS %}"], [cards]);
@@ -157,6 +160,52 @@ app.get("/product/:id", (req, res) => {
         });
 });
 
+app.get("/editproduct/:id", (req, res) => {
+    const id = req.params.id;
+
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        let output = replacement(edit, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+
+        if (id === "N") {
+            res.cookie("edit_type", "New", { httpOnly: true, maxAge: 86400000 });
+        } else {
+            res.cookie("edit_type", id, { httpOnly: true, maxAge: 86400000 });
+        }
+
+        res.setHeader("Content-Type", "text/html");
+        res.writeHead(200);
+        res.end(output);
+    } else {
+        res.status(401).json({ message: "Access Denied" });
+    }
+});
+
+app.get("/myshop", (req, res) => {
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        user_model.find({ id: req.params.id }).then((result) => {
+            product_model
+                .find({ owner: result.id })
+                .sort({ id: -1 })
+                .then((result2) => {
+                    let cards = "";
+
+                    for (let i = 0; i < result2.length; i++) {
+                        cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result2[i].id}N1`, result2[i].name, result2[i].description, result2[i].price, `/editproduct/${result2[i].id}`, "Edit..."]);
+                    }
+
+                    let output = replacement(myshop, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% SHOP_NAME %}", "{% PRODUCTS %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, req.cookies.shop_name, cards]);
+
+                    res.setHeader("Content-Type", "text/html");
+                    res.writeHead(200);
+                    res.end(output);
+                });
+        });
+    } else {
+        res.writeHead(302, { Location: "/login" });
+        res.end();
+    }
+});
+
 app.get("/login", (req, res) => {
     let output = replacement(login, ["{% CSS_FILE %}"], ["/css"]);
 
@@ -182,6 +231,18 @@ app.get("/success/:obj", (req, res) => {
     res.writeHead(200);
     res.end(output);
 });
+
+app.get("/fail/:obj/:status", (req, res) => {
+    const obj = req.params.obj;
+    const status = req.params.status;
+
+    let output = replacement(fail, ["{% OBJECT %}"], [obj]);
+
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead(status);
+    res.end(output);
+});
+
 //deal with data
 app.post("/logindata", (req, res) => {
     const data = req.body;
@@ -199,6 +260,7 @@ app.post("/logindata", (req, res) => {
                 res.cookie("id", result[0].id.toString(), { httpOnly: true, maxAge: 86400000 });
                 res.cookie("name", result[0].name, { httpOnly: true, maxAge: 86400000 });
                 res.cookie("au4a83", data.pwd, { httpOnly: true, maxAge: 86400000 });
+                res.cookie("shop_name", data.shop_name, { httpOnly: true, maxAge: 86400000 });
                 res.status(200).json({ message: "Login success" });
             }
         });
@@ -216,7 +278,7 @@ app.post("/signupdata", (req, res) => {
             if (result.length === 0) {
                 user_model
                     .find()
-                    .sort({ quantity: -1 })
+                    .sort({ id: -1 })
                     .then((result2) => {
                         const newAccount = new user_model({
                             id: result2[0].id + 1,
@@ -240,6 +302,8 @@ app.post("/signupdata", (req, res) => {
             }
         });
 });
+
+app.post("/editdata", (req, res) => {});
 
 //give css
 app.get("/css", (req, res) => {

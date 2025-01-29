@@ -446,6 +446,29 @@ section {
     color: var(--Green);
     clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
 }
+#fail {
+    width: 100vw;
+    height: 100vh;
+    background-color: red;
+    font-size: 10vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+#fail h1 {
+    font-size: 5vw;
+}
+#fail a {
+    padding: 20px;
+    padding-right: 40px;
+    padding-left: 40px;
+    font-size: 2vw;
+    background-color: white;
+    color: red;
+    clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+}
 footer {
     width: 94%;
     height: auto;
@@ -622,6 +645,122 @@ footer {
     justify-content: center;
 }
 .check_submit button {
+    width: 50%;
+    height: 40px;
+    clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+    background-color: var(--Green);
+    font-size: medium;
+}
+#head_sec {
+    width: 100%;
+    height: auto;
+    background-image: url(/img/sys/1/jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#shop_name {
+    width: 100%;
+    height: auto;
+    padding-top: 20vh;
+    padding-bottom: 10vh;
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#shop_new {
+    width: 96%;
+    height: auto;
+    padding: 2%;
+    background-color: var(--Gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#shop_new button {
+    width: 50%;
+    height: 40px;
+    clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+    background-color: var(--Green);
+    font-size: medium;
+}
+#shop_product {
+    height: auto;
+    width: 90%;
+    padding: 5%;
+    padding-top: 3%;
+    background-color: var(--Gray);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+#editProduct_secId {
+    width: 100%;
+    height: auto;
+    padding-top: 20vh;
+    padding-bottom: 10vh;
+    background-color: var(--Gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#editProduct_formId {
+    width: 60%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.editProduct_divCla {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+}
+.editProductTitle_divCla {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+}
+.editProductContain_divCla {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+#show_img_imgId {
+    width: 30%;
+    aspect-ratio: 1 / 1;
+}
+.editProduct_divCla input[type="text"] {
+    width: 100%;
+    height: 30px;
+    padding: 5px;
+    border-bottom: var(--Green) solid 1px;
+    background-color: var(--Light-Gray);
+    word-wrap: break-word;
+    font-size: medium;
+}
+#productDetail_inputId {
+    width: 100%;
+    height: 30vh;
+    padding: 5px;
+    border: var(--Green) solid 1px;
+    background-color: var(--Light-Gray);
+    font-size: medium;
+}
+.editProduct_divCla button {
     width: 50%;
     height: 40px;
     clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
