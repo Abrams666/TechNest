@@ -33,7 +33,7 @@ const app = Vue.createApp({
             }
 
             if (!is_err) {
-                fetch("/editdata", {
+                fetch("/editdata/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -41,7 +41,7 @@ const app = Vue.createApp({
                     body: JSON.stringify({
                         name: this.productName_input_str,
                         price: this.productPrice_input_str,
-                        des: this``.productDescription_input_str,
+                        des: this.productDescription_input_str,
                         detail: this.productDetail_input_str,
                     }),
                 })
@@ -49,7 +49,7 @@ const app = Vue.createApp({
                         if (res.status === 201) {
                             window.location.href = "/myshop";
                         } else if (res.status === 409) {
-                            this.ACCOUNT_ERR = "Email already exists.";
+                            //this.ACCOUNT_ERR = "Email already exists.";
                         }
                     })
                     .catch((error) => console.error("Error:", error));

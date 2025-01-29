@@ -62,23 +62,6 @@ const product_schema = new mongoose.Schema(
 const user_model = mongoose.model("user_model", user_schema);
 const product_model = mongoose.model("product_model", product_schema);
 
-// const newItem = new user_model({
-//     id: 2,
-//     password: "password",
-//     name: "name",
-//     email: "email@example.com",
-//     shop_name: "shop_name",
-//     cart_product: [1, 2, 3],
-//     my_product: [1, 2],
-// });
-// newItem.save().catch((err) => {
-//     console.log(err);
-// });
-
-// user_model.find().then((items) => {
-//     console.log("Items:", items);
-// });
-
 //function
 function replacement(origin_file, replace_text, replace_content) {
     let output = origin_file.toString();
@@ -183,24 +166,22 @@ app.get("/editproduct/:id", (req, res) => {
 
 app.get("/myshop", (req, res) => {
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        user_model.find({ id: req.params.id }).then((result) => {
-            product_model
-                .find({ owner: result.id })
-                .sort({ id: -1 })
-                .then((result2) => {
-                    let cards = "";
+        product_model
+            .find({ owner: req.cookies.id })
+            .sort({ id: -1 })
+            .then((result2) => {
+                let cards = "";
 
-                    for (let i = 0; i < result2.length; i++) {
-                        cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result2[i].id}N1`, result2[i].name, result2[i].description, result2[i].price, `/editproduct/${result2[i].id}`, "Edit..."]);
-                    }
+                for (let i = 0; i < result2.length; i++) {
+                    cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result2[i].id}N1`, result2[i].name, result2[i].description, result2[i].price, `/editproduct/${result2[i].id}`, "Edit..."]);
+                }
 
-                    let output = replacement(myshop, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% SHOP_NAME %}", "{% PRODUCTS %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, req.cookies.shop_name, cards]);
+                let output = replacement(myshop, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% SHOP_NAME %}", "{% PRODUCTS %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, req.cookies.shop_name, cards]);
 
-                    res.setHeader("Content-Type", "text/html");
-                    res.writeHead(200);
-                    res.end(output);
-                });
-        });
+                res.setHeader("Content-Type", "text/html");
+                res.writeHead(200);
+                res.end(output);
+            });
     } else {
         res.writeHead(302, { Location: "/login" });
         res.end();
@@ -318,7 +299,54 @@ app.post("/signupdata", (req, res) => {
         });
 });
 
-app.post("/editdata", (req, res) => {});
+app.post("/editdata", (req, res) => {
+    const data = req.body;
+
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        if (req.cookies.edit_type === "New") {
+            user_model
+                .find()
+                .sort({ id: -1 })
+                .then((result) => {
+                    const newProduct_obj = new product_model({
+                        id: result[0].id + 1,
+                        name: data.name,
+                        price: data.price,
+                        owner: req.cookies.id,
+                        picture_num: 1,
+                        description: data.des,
+                        detail: data.detail,
+                    });
+
+                    newProduct_obj.save().then(() => {
+                        res.clearCookie("edit_type", { path: "/" });
+                        res.status(201).json({ message: "Create success" });
+                    });
+                });
+        } else {
+            product_model
+                .findOneAndUpdate(
+                    { id: req.cookies.edit_type },
+                    {
+                        $set: {
+                            name: data.name,
+                            price: data.price,
+                            description: data.des,
+                            detail: data.detail,
+                        },
+                    },
+                    { upsert: true }
+                )
+                .then(() => {
+                    res.clearCookie("edit_type", { path: "/" });
+                    res.status(201).json({ message: "Update success" });
+                });
+        }
+    } else {
+        res.writeHead(302, { Location: "/fail/Access Denied/401" });
+        res.end();
+    }
+});
 
 //give css
 app.get("/css", (req, res) => {

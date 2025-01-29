@@ -68,7 +68,7 @@
                             <p>Detail:</p>
                             <p class="err_text">{{ PRODUCTDETAILERR_STR }}</p>
                         </div>
-                        <textarea type="text" id="productDetail_inputId" v-mode="productDetail_input_str"></textarea>
+                        <textarea type="text" id="productDetail_inputId" v-bind:value="productDetail_input_str"></textarea>
                     </div>
                     <div class="editProduct_divCla">
                         <button id="submit_btnId" v-on:click.prevent="submit_btn()">Submit</button>
