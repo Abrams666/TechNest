@@ -58,9 +58,21 @@ const product_schema = new mongoose.Schema(
         collection: "Product",
     }
 );
+const item_in_cart_schema = new mongoose.Schema(
+    {
+        product_id: Number,
+        product_name: String,
+        owner_id: Number,
+        amount: Number,
+    },
+    {
+        collection: "Item_In_Cart",
+    }
+);
 
 const user_model = mongoose.model("user_model", user_schema);
 const product_model = mongoose.model("product_model", product_schema);
+const item_in_cart_model = mongoose.model("item_in_cart_model", item_in_cart_schema);
 
 //function
 function replacement(origin_file, replace_text, replace_content) {
@@ -77,6 +89,8 @@ function replacement(origin_file, replace_text, replace_content) {
 const css = fs.readFileSync("./Template/css.css", "utf8");
 const home_page = fs.readFileSync("./Template/HomePage_Temp.html", "utf8");
 const home_page_card = fs.readFileSync("./Template/HomePageCard_Temp.html", "utf8");
+const cart = fs.readFileSync("./Template/Cart_Temp.html", "utf8");
+const cart_card = fs.readFileSync("./Template/Cart_Card_Temp.html", "utf8");
 const product = fs.readFileSync("./Template/Product_Temp.html", "utf8");
 const myshop = fs.readFileSync("./Template/My_Shop.html", "utf8");
 const edit = fs.readFileSync("./Template/Edit_Product_Temp.html", "utf8");
@@ -118,6 +132,30 @@ app.get("/", (req, res) => {
             res.writeHead(200);
             res.end(output);
         });
+});
+
+app.get("/cart", (req, res) => {
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        item_in_cart_model
+            .find({ owner_id: req.cookies.id })
+            .sort({ product_id: -1 })
+            .then((result) => {
+                let cards = "";
+
+                for (let i = 0; i < result.length; i++) {
+                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`], result[i].product_name, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id);
+                }
+
+                let output = replacement(cart, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% ITEM %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, cards]);
+
+                res.setHeader("Content-Type", "text/html");
+                res.writeHead(200);
+                res.end(output);
+            });
+    } else {
+        res.writeHead(302, { Location: "/login" });
+        res.end();
+    }
 });
 
 app.get("/product/:id", (req, res) => {
