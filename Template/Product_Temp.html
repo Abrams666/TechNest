@@ -31,21 +31,23 @@
         </header>
         <main>
             <section id="details">
-                <div id="details_img">
-                    <img src="{% PRODUCT_MAIN_IMG %}" alt="" />
-                </div>
-                <div id="details_texts">
-                    <div id="details_top">
-                        <h3>{% PRODUCT_NAME %}</h3>
-                        <p id="details_details">{% PRODUCT_DETAILS %}</p>
-                        <p>{% PRODUCT_LABELS %}</p>
-                        <a href="">{% PRODUCT_OWNER %}</a>
+                <form id="product_form">
+                    <div id="details_img">
+                        <img src="{% PRODUCT_MAIN_IMG %}" alt="" />
                     </div>
-                    <div id="details_bottom">
-                        <p id="details_price">${% PRODUCT_PRICE %}</p>
-                        <button><i class="fa-solid fa-cart-shopping"></i> Add To Cart</button>
+                    <div id="details_texts">
+                        <div id="details_top">
+                            <h3>{% PRODUCT_NAME %}</h3>
+                            <p id="details_details">{% PRODUCT_DETAILS %}</p>
+                            <p>{% PRODUCT_LABELS %}</p>
+                            <a href="">{% PRODUCT_OWNER %}</a>
+                        </div>
+                        <div id="details_bottom">
+                            <p id="details_price">${% PRODUCT_PRICE %}</p>
+                            <button v-on:click.prevent="add_item({% PRODUCT_ID %})"><i class="fa-solid fa-cart-shopping"></i> Add To Cart</button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </section>
             <section id="recommadation">
                 <h2>Products You May like</h2>
@@ -77,5 +79,7 @@
                 <p>Copyright© 2025 TechNest. All rights reserved.</p>
             </div>
         </footer>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+        <script src="/js/Product"></script>
     </body>
 </html>

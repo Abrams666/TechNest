@@ -61,7 +61,6 @@ const product_schema = new mongoose.Schema(
 const item_in_cart_schema = new mongoose.Schema(
     {
         product_id: Number,
-        product_name: String,
         owner_id: Number,
         amount: Number,
     },
@@ -143,7 +142,7 @@ app.get("/cart", (req, res) => {
                 let cards = "";
 
                 for (let i = 0; i < result.length; i++) {
-                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`], result[i].product_name, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id);
+                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`, result[i].product_name, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id]);
                 }
 
                 let output = replacement(cart, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% ITEM %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, cards]);
@@ -174,7 +173,7 @@ app.get("/product/:id", (req, res) => {
             id: id,
         })
         .then((result) => {
-            output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}"], [`/img/pro/${id}/1`, result[0].name, result[0].detail, result[0].owner, result[0].price]);
+            output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}"], [`/img/pro/${id}/1`, result[0].name, result[0].detail, result[0].owner, result[0].price, id]);
 
             res.setHeader("Content-Type", "text/html");
             res.writeHead(200);
@@ -342,7 +341,7 @@ app.post("/editdata", (req, res) => {
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
         if (req.cookies.edit_type === "New") {
-            user_model
+            product_model
                 .find()
                 .sort({ id: -1 })
                 .then((result) => {
@@ -382,6 +381,53 @@ app.post("/editdata", (req, res) => {
         }
     } else {
         res.writeHead(302, { Location: "/fail/Access Denied/401" });
+        res.end();
+    }
+});
+
+app.post("/additemdata/:type/:id", (req, res) => {
+    const type = req.params.type;
+    const id = req.params.id;
+
+    console.log(type);
+    console.log(id);
+
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        item_in_cart_model.find({ product_id: id, owner_id: req.cookies.id }).then((result) => {
+            if (result.length === 0) {
+                const newItem_in_cart = new item_in_cart_model({
+                    product_id: id,
+                    owner_id: req.cookies.id,
+                    amount: 1,
+                });
+
+                newItem_in_cart.save().then(() => {
+                    res.status(201).json({ message: "Join Item Success" });
+                });
+            } else {
+                if (type === "add") {
+                    item_in_cart_model.findOneAndUpdate({ product_id: id, owner_id: req.cookies.id }, { $set: { amount: result[0].amount + 1 } }).then(() => {
+                        res.status(201).json({ message: "Add Item Success" });
+                    });
+                } else if (type === "reduce") {
+                    if (result[0].amount === 1) {
+                        item_in_cart_model.findOneAndDelete({ product_id: id, owner_id: req.cookies.id }).then(() => {
+                            res.status(201).json({ message: "Remove Item Success" });
+                        });
+                    } else {
+                        item_in_cart_model.findOneAndUpdate({ product_id: id, owner_id: req.cookies.id }, { $set: { amount: result[0].amount - 1 } }).then(() => {
+                            res.status(201).json({ message: "Reduce Item Success" });
+                        });
+                    }
+                } else if (type === "delete") {
+                    item_in_cart_model.findOneAndDelete({ product_id: id, owner_id: req.cookies.id }).then(() => {
+                        res.status(201).json({ message: "Remove Item Success" });
+                    });
+                }
+            }
+        });
+    } else {
+        res.writeHead(302, { Location: "/login" });
         res.end();
     }
 });
