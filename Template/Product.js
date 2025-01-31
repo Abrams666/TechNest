@@ -10,8 +10,10 @@ const app = Vue.createApp({
                 .then((res) => {
                     if (res.status === 201) {
                         window.location.href = `/product/${id}`;
-                    } else if (res.status === 302) {
+                    } else if (res.status === 401) {
                         window.location.href = "/login";
+                    } else if (res.status === 402) {
+                        window.location.href = "/fail/Require Denied/401";
                     }
                 })
                 .catch((error) => console.error("Error:", error));

@@ -84,16 +84,15 @@ function replacement(origin_file, replace_text, replace_content) {
     return output;
 }
 
-function check_pwd(id, pwd) {
-    user_model.find({ id: id, password: pwd }).then((result) => {
-        if (result.length === 1) {
-            console.log("1");
-            return "1";
-        } else {
-            console.log("0");
-            return "0";
-        }
-    });
+async function check_pwd(id, pwd) {
+    let result = await user_model.find({ id: id, password: pwd });
+    if (result.length === 1) {
+        console.log("1");
+        return true;
+    } else {
+        console.log("0");
+        return false;
+    }
 }
 
 //read file
@@ -210,7 +209,7 @@ app.get("/editproduct/:id", (req, res) => {
         res.writeHead(200);
         res.end(output);
     } else {
-        res.status(401).json({ message: "Access Denied" });
+        res.redirect("/fail/Require Denied/401");
     }
 });
 
@@ -392,11 +391,11 @@ app.post("/editdata", (req, res) => {
                     });
             }
         } else {
-            res.writeHead(302, { Location: "/fail/Access Denied/401" });
+            res.status(401);
             res.end();
         }
     } else {
-        res.writeHead(302, { Location: "/fail/Access Denied/401" });
+        res.status(401);
         res.end();
     }
 });
@@ -406,7 +405,7 @@ app.post("/additemdata/:type/:id", (req, res) => {
     const id = req.params.id;
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        if (check_pwd(req.cookies.id, req.cookies.au4a83) === "1") {
+        if (check_pwd(req.cookies.id, req.cookies.au4a83)) {
             item_in_cart_model.find({ product_id: id, owner_id: req.cookies.id }).then((result) => {
                 if (result.length === 0) {
                     const newItem_in_cart = new item_in_cart_model({
@@ -441,11 +440,11 @@ app.post("/additemdata/:type/:id", (req, res) => {
                 }
             });
         } else {
-            res.writeHead(302, { Location: "/fail/Access Denied/401" });
+            res.status(402);
             res.end();
         }
     } else {
-        res.writeHead(302, { Location: "/login" });
+        res.status(401);
         res.end();
     }
 });

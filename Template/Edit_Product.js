@@ -48,8 +48,8 @@ const app = Vue.createApp({
                     .then((res) => {
                         if (res.status === 201) {
                             window.location.href = "/myshop";
-                        } else if (res.status === 409) {
-                            //this.ACCOUNT_ERR = "Email already exists.";
+                        } else if (res.status === 401) {
+                            window.location.href = "/fail/Require Denied/401";
                         }
                     })
                     .catch((error) => console.error("Error:", error));
