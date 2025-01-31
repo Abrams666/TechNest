@@ -84,6 +84,18 @@ function replacement(origin_file, replace_text, replace_content) {
     return output;
 }
 
+function check_pwd(id, pwd) {
+    user_model.find({ id: id, password: pwd }).then((result) => {
+        if (result.length === 1) {
+            console.log("1");
+            return "1";
+        } else {
+            console.log("0");
+            return "0";
+        }
+    });
+}
+
 //read file
 const css = fs.readFileSync("./Template/css.css", "utf8");
 const home_page = fs.readFileSync("./Template/HomePage_Temp.html", "utf8");
@@ -102,7 +114,7 @@ const not_found = fs.readFileSync("./Template/404.html", "utf8");
 
 //give page
 app.get("/", (req, res) => {
-    let output = replacement(home_page, ["{% CSS_FILE %}"], ["/css"]);
+    let output = home_page;
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
         output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
@@ -161,7 +173,7 @@ app.get("/cart", (req, res) => {
 app.get("/product/:id", (req, res) => {
     const id = req.params.id;
 
-    let output = replacement(product, ["{% CSS_FILE %}"], ["/css"]);
+    let output = product;
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
         output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
@@ -234,13 +246,13 @@ app.get("/setting/:a", (req, res) => {
         res.writeHead(200);
         res.end(output);
     } else {
-        res.writeHead(302, { Location: "/fail/Access Denied/401" });
+        res.writeHead(302, { Location: "/login" });
         res.end();
     }
 });
 
 app.get("/login", (req, res) => {
-    let output = replacement(login, ["{% CSS_FILE %}"], ["/css"]);
+    let output = login;
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -248,7 +260,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/signup", (req, res) => {
-    let output = replacement(signup, ["{% CSS_FILE %}"], ["/css"]);
+    let output = signup;
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -258,7 +270,7 @@ app.get("/signup", (req, res) => {
 app.get("/success/:obj", (req, res) => {
     const obj = req.params.obj;
 
-    let output = replacement(success, ["{% CSS_FILE %}", "{% OBJECT %}"], ["/css", obj]);
+    let output = replacement(success, ["{% OBJECT %}"], [obj]);
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -339,44 +351,49 @@ app.post("/editdata", (req, res) => {
     const data = req.body;
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        if (req.cookies.edit_type === "New") {
-            product_model
-                .find()
-                .sort({ id: -1 })
-                .then((result) => {
-                    const newProduct_obj = new product_model({
-                        id: result[0].id + 1,
-                        name: data.name,
-                        price: data.price,
-                        owner: req.cookies.id,
-                        picture_num: 1,
-                        description: data.des,
-                        detail: data.detail,
-                    });
-
-                    newProduct_obj.save().then(() => {
-                        res.clearCookie("edit_type", { path: "/" });
-                        res.status(201).json({ message: "Create success" });
-                    });
-                });
-        } else {
-            product_model
-                .findOneAndUpdate(
-                    { id: req.cookies.edit_type },
-                    {
-                        $set: {
+        if (check_pwd(req.cookies.id, req.cookies.au4a83)) {
+            if (req.cookies.edit_type === "New") {
+                product_model
+                    .find()
+                    .sort({ id: -1 })
+                    .then((result) => {
+                        const newProduct_obj = new product_model({
+                            id: result[0].id + 1,
                             name: data.name,
                             price: data.price,
+                            owner: req.cookies.id,
+                            picture_num: 1,
                             description: data.des,
                             detail: data.detail,
+                        });
+
+                        newProduct_obj.save().then(() => {
+                            res.clearCookie("edit_type", { path: "/" });
+                            res.status(201).json({ message: "Create success" });
+                        });
+                    });
+            } else {
+                product_model
+                    .findOneAndUpdate(
+                        { id: req.cookies.edit_type },
+                        {
+                            $set: {
+                                name: data.name,
+                                price: data.price,
+                                description: data.des,
+                                detail: data.detail,
+                            },
                         },
-                    },
-                    { upsert: true }
-                )
-                .then(() => {
-                    res.clearCookie("edit_type", { path: "/" });
-                    res.status(201).json({ message: "Update success" });
-                });
+                        { upsert: true }
+                    )
+                    .then(() => {
+                        res.clearCookie("edit_type", { path: "/" });
+                        res.status(201).json({ message: "Update success" });
+                    });
+            }
+        } else {
+            res.writeHead(302, { Location: "/fail/Access Denied/401" });
+            res.end();
         }
     } else {
         res.writeHead(302, { Location: "/fail/Access Denied/401" });
@@ -389,39 +406,44 @@ app.post("/additemdata/:type/:id", (req, res) => {
     const id = req.params.id;
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        item_in_cart_model.find({ product_id: id, owner_id: req.cookies.id }).then((result) => {
-            if (result.length === 0) {
-                const newItem_in_cart = new item_in_cart_model({
-                    product_id: id,
-                    owner_id: req.cookies.id,
-                    amount: 1,
-                });
-
-                newItem_in_cart.save().then(() => {
-                    res.status(201).json({ message: "Join Item Success" });
-                });
-            } else {
-                if (type === "add") {
-                    item_in_cart_model.findOneAndUpdate({ product_id: id, owner_id: req.cookies.id }, { $set: { amount: result[0].amount + 1 } }).then(() => {
-                        res.status(201).json({ message: "Add Item Success" });
+        if (check_pwd(req.cookies.id, req.cookies.au4a83) === "1") {
+            item_in_cart_model.find({ product_id: id, owner_id: req.cookies.id }).then((result) => {
+                if (result.length === 0) {
+                    const newItem_in_cart = new item_in_cart_model({
+                        product_id: id,
+                        owner_id: req.cookies.id,
+                        amount: 1,
                     });
-                } else if (type === "reduce") {
-                    if (result[0].amount === 1) {
+
+                    newItem_in_cart.save().then(() => {
+                        res.status(201).json({ message: "Join Item Success" });
+                    });
+                } else {
+                    if (type === "add") {
+                        item_in_cart_model.findOneAndUpdate({ product_id: id, owner_id: req.cookies.id }, { $set: { amount: result[0].amount + 1 } }).then(() => {
+                            res.status(201).json({ message: "Add Item Success" });
+                        });
+                    } else if (type === "reduce") {
+                        if (result[0].amount === 1) {
+                            item_in_cart_model.findOneAndDelete({ product_id: id, owner_id: req.cookies.id }).then(() => {
+                                res.status(201).json({ message: "Remove Item Success" });
+                            });
+                        } else {
+                            item_in_cart_model.findOneAndUpdate({ product_id: id, owner_id: req.cookies.id }, { $set: { amount: result[0].amount - 1 } }).then(() => {
+                                res.status(201).json({ message: "Reduce Item Success" });
+                            });
+                        }
+                    } else if (type === "delete") {
                         item_in_cart_model.findOneAndDelete({ product_id: id, owner_id: req.cookies.id }).then(() => {
                             res.status(201).json({ message: "Remove Item Success" });
                         });
-                    } else {
-                        item_in_cart_model.findOneAndUpdate({ product_id: id, owner_id: req.cookies.id }, { $set: { amount: result[0].amount - 1 } }).then(() => {
-                            res.status(201).json({ message: "Reduce Item Success" });
-                        });
                     }
-                } else if (type === "delete") {
-                    item_in_cart_model.findOneAndDelete({ product_id: id, owner_id: req.cookies.id }).then(() => {
-                        res.status(201).json({ message: "Remove Item Success" });
-                    });
                 }
-            }
-        });
+            });
+        } else {
+            res.writeHead(302, { Location: "/fail/Access Denied/401" });
+            res.end();
+        }
     } else {
         res.writeHead(302, { Location: "/login" });
         res.end();
@@ -474,7 +496,7 @@ app.get("/img/pro/:id/:num", (req, res) => {
 
 //404
 app.use((req, res) => {
-    let output = replacement(not_found, ["{% CSS_FILE %}"], ["/css"]);
+    let output = not_found;
 
     if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
         output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
