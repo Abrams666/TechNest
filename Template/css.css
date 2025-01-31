@@ -681,12 +681,16 @@ footer {
     align-items: center;
     justify-content: center;
 }
-#shop_new button {
+#shop_new a {
     width: 50%;
     height: 40px;
     clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
     background-color: var(--Green);
+    color: var(--Gray);
     font-size: medium;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 #shop_product {
     height: auto;
@@ -875,6 +879,9 @@ footer {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+button {
+    color: var(--Gray);
 }
 button:hover {
     background-color: rgb(0, 255, 0);

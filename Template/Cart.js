@@ -21,7 +21,9 @@ const app = Vue.createApp({
                 }
             });
         },
-        delete(id) {
+        ddelete(id) {
+            console.log("delete");
+
             fetch(`/additemdata/delete/${id}`, {
                 method: "POST",
             }).then((res) => {
