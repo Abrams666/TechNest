@@ -473,27 +473,6 @@ section {
     color: red;
     clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
 }
-footer {
-    width: 94%;
-    height: auto;
-    padding: 3%;
-    padding-bottom: 10px;
-    background-color: black;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-#footer_div1_1 {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: row;
-    align-items: start;
-    justify-content: center;
-    gap: 10%;
-}
 #setting_sec {
     width: 100%;
     height: auto;
@@ -778,20 +757,23 @@ footer {
 #cart_secId {
     width: 100%;
     height: auto;
+    min-height: 70vh;
     padding-top: 20vh;
     padding-bottom: 10vh;
     background-color: var(--Gray);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: start;
 }
 #cart_formId {
     width: 80%;
     height: auto;
+    min-height: 70vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 20px;
 }
 #cart_divId {
@@ -855,8 +837,29 @@ footer {
     background-color: var(--Green);
     font-size: medium;
 }
+footer {
+    width: 94%;
+    height: auto;
+    padding: 3%;
+    padding-bottom: 10px;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+#footer_div1_1 {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: center;
+    gap: 10%;
+}
 .footer_div2 {
-    width: auto;
+    width: 5%;
     height: auto;
     display: flex;
     flex-direction: column;

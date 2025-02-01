@@ -95,10 +95,8 @@ function is_login(req) {
 async function check_pwd(id, pwd) {
     let result = await user_model.find({ id: id, password: pwd });
     if (result.length === 1) {
-        console.log("1");
         return true;
     } else {
-        console.log("0");
         return false;
     }
 }
