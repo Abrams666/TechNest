@@ -84,6 +84,14 @@ function replacement(origin_file, replace_text, replace_content) {
     return output;
 }
 
+function is_login(req) {
+    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 async function check_pwd(id, pwd) {
     let result = await user_model.find({ id: id, password: pwd });
     if (result.length === 1) {
@@ -92,6 +100,14 @@ async function check_pwd(id, pwd) {
     } else {
         console.log("0");
         return false;
+    }
+}
+
+function replace_login_status(origin_file, req, is_login) {
+    if (is_login) {
+        return replacement(origin_file, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting`, "Setting", "/setting"]);
+    } else {
+        return replacement(origin_file, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "Login", "/login"]);
     }
 }
 
@@ -115,10 +131,10 @@ const not_found = fs.readFileSync("./Template/404.html", "utf8");
 app.get("/", (req, res) => {
     let output = home_page;
 
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    if (is_login(req)) {
+        output = replace_login_status(output, req, true);
     } else {
-        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
+        output = replace_login_status(output, req, false);
     }
 
     product_model
@@ -145,7 +161,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/cart", (req, res) => {
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+    if (is_login(req)) {
         item_in_cart_model
             .find({ owner_id: req.cookies.id })
             .sort({ product_id: -1 })
@@ -157,15 +173,16 @@ app.get("/cart", (req, res) => {
                     cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`, result2[0].name, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id]);
                 }
 
-                let output = replacement(cart, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% ITEM %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, cards]);
+                let output = replace_login_status(cart, req, true);
+                output = replacement(output, ["{% ITEM %}"], [cards]);
 
                 res.setHeader("Content-Type", "text/html");
                 res.writeHead(200);
                 res.end(output);
             });
     } else {
-        res.writeHead(302, { Location: "/login" });
-        res.end();
+        res.status(401);
+        res.redirect("/login");
     }
 });
 
@@ -174,10 +191,10 @@ app.get("/product/:id", (req, res) => {
 
     let output = product;
 
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    if (is_login(req)) {
+        output = replace_login_status(output, req, true);
     } else {
-        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
+        output = replace_login_status(output, req, false);
     }
 
     product_model
@@ -196,8 +213,8 @@ app.get("/product/:id", (req, res) => {
 app.get("/editproduct/:id", (req, res) => {
     const id = req.params.id;
 
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        let output = replacement(edit, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    if (is_login(req)) {
+        let output = replace_login_status(edit, req, true);
 
         if (id === "N") {
             res.cookie("edit_type", "New", { maxAge: 86400000 });
@@ -209,12 +226,13 @@ app.get("/editproduct/:id", (req, res) => {
         res.writeHead(200);
         res.end(output);
     } else {
+        res.status(401);
         res.redirect("/fail/Require Denied/401");
     }
 });
 
 app.get("/myshop", (req, res) => {
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+    if (is_login(req)) {
         product_model
             .find({ owner: req.cookies.id })
             .sort({ id: -1 })
@@ -225,33 +243,34 @@ app.get("/myshop", (req, res) => {
                     cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result2[i].id}N1`, result2[i].name, result2[i].description, result2[i].price, `/editproduct/${result2[i].id}`, "Edit..."]);
                 }
 
-                let output = replacement(myshop, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}", "{% SHOP_NAME %}", "{% PRODUCTS %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, req.cookies.shop_name, cards]);
+                let output = replace_login_status(myshop, req, true);
+                output = replacement(output, ["{% SHOP_NAME %}", "{% PRODUCTS %}"], [req.cookies.shop_name, cards]);
 
                 res.setHeader("Content-Type", "text/html");
                 res.writeHead(200);
                 res.end(output);
             });
     } else {
-        res.writeHead(302, { Location: "/login" });
-        res.end();
+        res.status(401);
+        res.redirect("/login");
     }
 });
 
-app.get("/setting/:a", (req, res) => {
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        let output = replacement(setting, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+app.get("/setting", (req, res) => {
+    if (is_login(req)) {
+        let output = replace_login_status(setting, req, true);
 
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
         res.end(output);
     } else {
-        res.writeHead(302, { Location: "/login" });
-        res.end();
+        res.status(401);
+        res.redirect("/fail/Access Denied/401");
     }
 });
 
 app.get("/login", (req, res) => {
-    let output = login;
+    let output = replace_login_status(login, req, false);
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -259,7 +278,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/signup", (req, res) => {
-    let output = signup;
+    let output = replace_login_status(signup, req, false);
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(200);
@@ -349,7 +368,7 @@ app.post("/signupdata", (req, res) => {
 app.post("/editdata", (req, res) => {
     const data = req.body;
 
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+    if (is_login(req)) {
         if (check_pwd(req.cookies.id, req.cookies.au4a83)) {
             if (req.cookies.edit_type === "New") {
                 product_model
@@ -404,7 +423,7 @@ app.post("/additemdata/:type/:id", (req, res) => {
     const type = req.params.type;
     const id = req.params.id;
 
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
+    if (is_login(req)) {
         if (check_pwd(req.cookies.id, req.cookies.au4a83)) {
             item_in_cart_model.find({ product_id: id, owner_id: req.cookies.id }).then((result) => {
                 if (result.length === 0) {
@@ -497,10 +516,10 @@ app.get("/img/pro/:id/:num", (req, res) => {
 app.use((req, res) => {
     let output = not_found;
 
-    if (req.cookies.id && req.cookies.au4a83 && req.cookies.name) {
-        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], [`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`, `<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting/${req.cookies.id}`]);
+    if (is_login(req)) {
+        output = replace_login_status(output, req, true);
     } else {
-        output = replacement(output, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "<i class='fa-solid fa-right-to-bracket'></i> Login", "/login"]);
+        output = replace_login_status(output, req, false);
     }
 
     res.setHeader("Content-Type", "text/html");
