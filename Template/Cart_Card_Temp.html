@@ -1,9 +1,10 @@
 <div class="cartItem_divCla">
     <img src="{% ITEMIMG_URL %}" />
-    <p>{% ITEMNAME_P_STR %}</p>
+    <p class="itemName_pCla">{% ITEMNAME_P_STR %}</p>
     <div class="itemNum_divCla">
+        <p>${% ITEMPRICE_STR %}</p>
         <button v-on:click.prevent="reduce({% ITEMID_INT %})">-</button>
-        <p>{% ITEMNUM_STR %}</p>
+        <p class="itemNum_pCla">{% ITEMNUM_STR %}</p>
         <button v-on:click.prevent="add({% ITEMID_INT %})">+</button>
     </div>
     <button class="delete_item_btnCla" v-on:click.prevent="ddelete({% ITEMID_INT %})"><i class="fa-solid fa-trash"></i></button>

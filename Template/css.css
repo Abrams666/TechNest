@@ -811,13 +811,16 @@ section {
     background-color: var(--Green);
     font-size: medium;
 }
+.itemName_pCla {
+    font-size: larger;
+}
 .itemNum_divCla {
     width: 40%;
     height: 25%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
     gap: 10px;
 }
 .itemNum_divCla button {
@@ -827,7 +830,7 @@ section {
     background-color: var(--Green);
     font-size: larger;
 }
-.itemNum_divCla p {
+.itemNum_pCla {
     font-size: x-large;
 }
 #pay_btnId {

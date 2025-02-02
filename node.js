@@ -168,7 +168,7 @@ app.get("/cart", (req, res) => {
 
                 for (let i = 0; i < result.length; i++) {
                     let result2 = await product_model.find({ id: result[i].product_id });
-                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`, result2[0].name, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id]);
+                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMPRICE_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`, result2[0].name, result2[0].price * result[i].amount, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id]);
                 }
 
                 let output = replace_login_status(cart, req, true);
