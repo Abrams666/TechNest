@@ -37,8 +37,6 @@ const user_schema = new mongoose.Schema(
         name: String,
         email: String,
         shop_name: String,
-        cart_product: Array,
-        my_product: Array,
     },
     {
         collection: "User",
@@ -50,6 +48,7 @@ const product_schema = new mongoose.Schema(
         name: String,
         price: Number,
         owner: Number,
+        hashtag: Array,
         picture_num: Number,
         description: String,
         detail: String,
@@ -107,6 +106,29 @@ function replace_login_status(origin_file, req, is_login) {
     } else {
         return replacement(origin_file, ["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"], ["<i class='fa-solid fa-right-to-bracket'></i> Login", "/login", "Login", "/login"]);
     }
+}
+
+function split_hashtag(hashtag_str) {
+    let hashtag_strArr_1 = hashtag_str.toLowerCase().trim().split(/\s+/);
+    let hashtag_strArr_2 = [];
+
+    for (let i = 0; i < hashtag_strArr_1.length; i++) {
+        if (!hashtag_strArr_2.includes(hashtag_strArr_1[i])) {
+            hashtag_strArr_2.push(hashtag_strArr_1[i]);
+        }
+    }
+
+    return hashtag_strArr_2;
+}
+
+function arr_to_str(arr) {
+    let str = "";
+
+    for (let i = 0; i < arr.length; i++) {
+        str += arr[i] + " ";
+    }
+
+    return str;
 }
 
 //read file
@@ -216,13 +238,26 @@ app.get("/editproduct/:id", (req, res) => {
 
         if (id === "N") {
             res.cookie("edit_type", "New", { maxAge: 86400000 });
+            output = replacement(output, ["{% ID %}"], [""]);
+
+            res.setHeader("Content-Type", "text/html");
+            res.writeHead(200);
+            res.end(output);
         } else {
             res.cookie("edit_type", id, { maxAge: 86400000 });
-        }
 
-        res.setHeader("Content-Type", "text/html");
-        res.writeHead(200);
-        res.end(output);
+            product_model
+                .find({
+                    id: id,
+                })
+                .then((result) => {
+                    output = replacement(output, ["{% ID %}"], [`/${id}`]);
+
+                    res.setHeader("Content-Type", "text/html");
+                    res.writeHead(200);
+                    res.end(output);
+                });
+        }
     } else {
         res.status(401);
         res.redirect("/fail/Require Denied/401");
@@ -345,8 +380,6 @@ app.post("/signupdata", (req, res) => {
                             name: data.name,
                             email: data.acc,
                             shop_name: data.shop,
-                            cart_product: [],
-                            my_product: [],
                         });
 
                         newAccount.save().then(() => {
@@ -363,11 +396,13 @@ app.post("/signupdata", (req, res) => {
         });
 });
 
-app.post("/editdata", (req, res) => {
+app.post("/editdata", async (req, res) => {
     const data = req.body;
 
+    //console.log(data);
+
     if (is_login(req)) {
-        if (check_pwd(req.cookies.id, req.cookies.au4a83)) {
+        if (await check_pwd(req.cookies.id, req.cookies.au4a83)) {
             if (req.cookies.edit_type === "New") {
                 product_model
                     .find()
@@ -378,6 +413,7 @@ app.post("/editdata", (req, res) => {
                             name: data.name,
                             price: data.price,
                             owner: req.cookies.id,
+                            hashtag: split_hashtag(data.hashtag),
                             picture_num: 1,
                             description: data.des,
                             detail: data.detail,
@@ -396,6 +432,7 @@ app.post("/editdata", (req, res) => {
                             $set: {
                                 name: data.name,
                                 price: data.price,
+                                hashtag: split_hashtag(data.hashtag),
                                 description: data.des,
                                 detail: data.detail,
                             },
@@ -408,7 +445,7 @@ app.post("/editdata", (req, res) => {
                     });
             }
         } else {
-            res.status(401);
+            res.status(403);
             res.end();
         }
     } else {
@@ -474,12 +511,31 @@ app.get("/css", (req, res) => {
 });
 
 //give js
-app.get("/js/:filename", (req, res) => {
+app.get("/js/:filename/:id?", (req, res) => {
     const filename = req.params.filename;
+    const id = req.params.id;
 
     fs.readFile(`./Template/${filename}.js`, (err, data) => {
-        res.writeHead(200, { "Content-Type": "text/javascript" });
-        res.end(data);
+        if (filename === "Edit_Product" && id) {
+            product_model
+                .find({
+                    id: id,
+                })
+                .then((result) => {
+                    data = replacement(data, ["{% DEFALUT_PRODUCTNAME_INPUT_STR %}", "{% DEFALUT_PRODUCTPRICE_INPUT_STR %}", "{% DEFALUT_PRODUCTHASHTAGE_INPUT_STR %}", "{% DEFALUT_PRODUCTDES_INPUT_STR %}", "{% DEFALUT_PRODUCTDET_INPUT_STR %}"], [result[0].name, result[0].price, arr_to_str(result[0].hashtag), result[0].description, result[0].detail]);
+
+                    res.writeHead(200, { "Content-Type": "text/javascript" });
+                    res.end(data);
+                });
+        } else if (filename === "Edit_Product" && !id) {
+            data = replacement(data, ["{% DEFALUT_PRODUCTNAME_INPUT_STR %}", "{% DEFALUT_PRODUCTPRICE_INPUT_STR %}", "{% DEFALUT_PRODUCTHASHTAGE_INPUT_STR %}", "{% DEFALUT_PRODUCTDES_INPUT_STR %}", "{% DEFALUT_PRODUCTDET_INPUT_STR %}"], ["", "", "", "", ""]);
+
+            res.writeHead(200, { "Content-Type": "text/javascript" });
+            res.end(data);
+        } else {
+            res.writeHead(200, { "Content-Type": "text/javascript" });
+            res.end(data);
+        }
     });
 });
 

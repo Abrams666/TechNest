@@ -58,7 +58,14 @@
                     </div>
                     <div class="editProduct_divCla">
                         <div class="editProductTitle_divCla">
-                            <p>Description</p>
+                            <p>Hashtag:(Splite with a space, Don't include "#")</p>
+                            <p class="err_text">{{ PRODUCTHASHTAGERR_STR }}</p>
+                        </div>
+                        <input type="text" v-model="productHashtag_input_str" />
+                    </div>
+                    <div class="editProduct_divCla">
+                        <div class="editProductTitle_divCla">
+                            <p>Description:</p>
                             <p class="err_text">{{ PRODUCTDESCRIPTIONERR_STR }}</p>
                         </div>
                         <input type="text" v-model="productDescription_input_str" />
@@ -68,7 +75,7 @@
                             <p>Detail:</p>
                             <p class="err_text">{{ PRODUCTDETAILERR_STR }}</p>
                         </div>
-                        <textarea type="text" id="productDetail_inputId" v-bind:value="productDetail_input_str"></textarea>
+                        <textarea type="text" id="productDetail_inputId" v-model="productDetail_input_str"></textarea>
                     </div>
                     <div class="editProduct_divCla">
                         <button id="submit_btnId" v-on:click.prevent="submit_btn()">Submit</button>
@@ -116,6 +123,6 @@
             </div>
         </footer>
         <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
-        <script src="/js/Edit_Product"></script>
+        <script src="/js/Edit_Product{% ID %}"></script>
     </body>
 </html>
