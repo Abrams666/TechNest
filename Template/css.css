@@ -66,6 +66,8 @@ nav ul {
 main {
     width: 100%;
     height: auto;
+    min-height: 100vh;
+    background-color: var(--Gray);
 }
 section {
     width: 100%;
@@ -837,6 +839,46 @@ section {
     width: 50%;
     height: 30px;
     clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+    background-color: var(--Green);
+    font-size: medium;
+}
+#result_secId {
+    width: 100%;
+    height: auto;
+    padding-top: 15vh;
+    padding-bottom: 5vh;
+    background-color: var(--Gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#result_formId {
+    width: 90%;
+    height: auto;
+}
+#result_divId {
+    width: 100%;
+    height: auto;
+    clip-path: polygon(3% 0%, 100% 0%, 97% 100%, 0% 100%);
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+#result_divId input {
+    width: 70%;
+    height: 30px;
+    padding: 5px;
+    padding-left: 3.5%;
+    color: var(--Gray);
+    background-color: white;
+    font-size: medium;
+}
+#result_divId button {
+    width: 30%;
+    height: 40px;
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
     background-color: var(--Green);
     font-size: medium;
 }

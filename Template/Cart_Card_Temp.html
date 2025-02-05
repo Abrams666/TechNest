@@ -1,6 +1,6 @@
 <div class="cartItem_divCla">
     <img src="{% ITEMIMG_URL %}" />
-    <p class="itemName_pCla">{% ITEMNAME_P_STR %}</p>
+    <a href="{% product_url %}" class="itemName_pCla">{% ITEMNAME_P_STR %}</a>
     <div class="itemNum_divCla">
         <p>${% ITEMPRICE_STR %}</p>
         <button v-on:click.prevent="reduce({% ITEMID_INT %})">-</button>

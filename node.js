@@ -184,6 +184,7 @@ const cart = fs.readFileSync("./Template/Cart_Temp.html", "utf8");
 const cart_card = fs.readFileSync("./Template/Cart_Card_Temp.html", "utf8");
 const product = fs.readFileSync("./Template/Product_Temp.html", "utf8");
 const myshop = fs.readFileSync("./Template/My_Shop.html", "utf8");
+const search = fs.readFileSync("./Template/Search_Temp.html", "utf8");
 const edit = fs.readFileSync("./Template/Edit_Product_Temp.html", "utf8");
 const setting = fs.readFileSync("./Template/Setting_Temp.html", "utf8");
 const login = fs.readFileSync("./Template/Login_Temp.html", "utf8");
@@ -235,7 +236,7 @@ app.get("/cart", (req, res) => {
 
                 for (let i = 0; i < result.length; i++) {
                     let result2 = await product_model.find({ id: result[i].product_id });
-                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMPRICE_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}"], [`img/pro/${result[i].product_id}/1`, result2[0].name, result2[0].price * result[i].amount, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id]);
+                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMPRICE_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}", "{% product_url %}"], [`img/pro/${result[i].product_id}/1`, result2[0].name, result2[0].price * result[i].amount, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id, `product/${result[i].product_id}`]);
                 }
 
                 let output = replace_login_status(cart, req, true);
@@ -267,11 +268,20 @@ app.get("/product/:id", (req, res) => {
             id: id,
         })
         .then((result) => {
-            output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}"], [`/img/pro/${id}/1`, result[0].name, result[0].detail, result[0].owner, result[0].price, id]);
+            if (!(result.length === 0)) {
+                let hashtag_str = "";
+                for (let i = 0; i < result[0].hashtag.length; i++) {
+                    hashtag_str += `<a href="/search/${result[0].hashtag[i]}">#${result[0].hashtag[i]} ,</a>`;
+                }
+                output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}", "{% PRODUCT_LABELS %}"], [`/img/pro/${id}/1`, result[0].name, result[0].detail, result[0].owner, result[0].price, id, hashtag_str]);
 
-            res.setHeader("Content-Type", "text/html");
-            res.writeHead(200);
-            res.end(output);
+                res.setHeader("Content-Type", "text/html");
+                res.writeHead(200);
+                res.end(output);
+            } else {
+                res.status(404);
+                res.redirect("/notfound");
+            }
         });
 });
 
@@ -345,6 +355,61 @@ app.get("/setting", (req, res) => {
         res.status(401);
         res.redirect("/fail/Access Denied/401");
     }
+});
+
+app.get("/search/:contain", (req, res) => {
+    const contain = split_hashtag(req.params.contain);
+    const search_conditions = {
+        $or: [{ name: { $regex: contain.join("|"), $options: "i" } }, { hashtag: { $in: contain } }],
+    };
+
+    product_model
+        .find(search_conditions)
+        .sort({ id: -1 })
+        .then((result) => {
+            let output = "";
+
+            if (!(result.length === 0)) {
+                let score_intArr = [];
+                let max_score_int = 0;
+                let cards = "";
+
+                for (let i = 0; i < result.length; i++) {
+                    score_intArr.push(0);
+
+                    for (let j = 0; j < result[i].hashtag.length; j++) {
+                        if (contain.includes(result[i].hashtag[j])) {
+                            score_intArr[i] += 1;
+                        }
+                    }
+                    if (contain.some((item) => result[i].name.includes(item))) {
+                        score_intArr[i] += 1;
+                    }
+
+                    if (score_intArr[i] > max_score_int) {
+                        max_score_int = score_intArr[i];
+                    }
+                }
+
+                for (let i = max_score_int; i > 0; i--) {
+                    for (let j = 0; j < result.length; j++) {
+                        if (score_intArr[j] === i) {
+                            cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}N1`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}`, "View More..."]);
+                        }
+                    }
+                }
+                output = replacement(search, ["{% PRODUCTS %}"], [cards]);
+            } else {
+                output = replacement(search, ["{% PRODUCTS %}"], ["No products found"]);
+            }
+
+            output = replace_login_status(output, req, is_login(req));
+            output = replacement(output, ["{% contain %}"], [req.params.contain]);
+
+            res.setHeader("Content-Type", "text/html");
+            res.writeHead(200);
+            res.end(output);
+        });
 });
 
 app.get("/login", (req, res) => {
@@ -579,6 +644,11 @@ app.get("/js/:filename/:id?", (req, res) => {
                 });
         } else if (filename === "Edit_Product" && !id) {
             data = replacement(data, ["{% DEFALUT_PRODUCTNAME_INPUT_STR %}", "{% DEFALUT_PRODUCTPRICE_INPUT_STR %}", "{% DEFALUT_PRODUCTHASHTAGE_INPUT_STR %}", "{% DEFALUT_PRODUCTDES_INPUT_STR %}", "{% DEFALUT_PRODUCTDET_INPUT_STR %}"], ["", "", "", "", ""]);
+
+            res.writeHead(200, { "Content-Type": "text/javascript" });
+            res.end(data);
+        } else if (filename === "Search" && id) {
+            data = replacement(data, ["{% search_contain_str %}"], [id]);
 
             res.writeHead(200, { "Content-Type": "text/javascript" });
             res.end(data);

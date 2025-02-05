@@ -36,10 +36,10 @@
                         <h1>Tech</h1>
                         <h1 style="color: rgb(1, 215, 1)">Nest</h1>
                     </div>
-                    <div id="face_div2_2">
-                        <input type="text" />
-                        <button type="submit">Search</button>
-                    </div>
+                    <form id="face_div2_2">
+                        <input type="text" v-model="search_contain_input" />
+                        <button type="submit" v-on:click.prevent="search()">Search</button>
+                    </form>
                     <i id="face-down" class="fa-solid fa-chevron-down fa-bounce"></i>
                 </div>
             </section>
@@ -84,5 +84,7 @@
                 <p>Copyright© 2025 TechNest. All rights reserved.</p>
             </div>
         </footer>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+        <script src="/js/HomePage"></script>
     </body>
 </html>
