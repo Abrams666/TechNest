@@ -6,9 +6,14 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const multer = require("multer");
+const path = require("path");
+const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
+app.use(express.static("uploads"));
 
 //config
 dotenv.config({ path: "./config.env" });
@@ -71,6 +76,46 @@ const item_in_cart_schema = new mongoose.Schema(
 const user_model = mongoose.model("user_model", user_schema);
 const product_model = mongoose.model("product_model", product_schema);
 const item_in_cart_model = mongoose.model("item_in_cart_model", item_in_cart_schema);
+
+//file
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "/Database/Product_Picture/");
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+
+        if (req.cookies.edit_type === "New") {
+            product_model
+                .find()
+                .sort({ id: -1 })
+                .then((result) => {
+                    const userId = result[0].id + 1;
+                });
+        } else {
+            const userId = req.cookies.edit_type;
+        }
+
+        if (!req.fileIndex) req.fileIndex = 1;
+
+        const newFileName = `${userId}N${req.fileIndex}${ext}`;
+        req.fileIndex++;
+
+        cb(null, newFileName);
+    },
+});
+
+const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ["image/png", "image/jpeg"];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("不支援的檔案格式"), false);
+        }
+    },
+});
 
 //function
 function replacement(origin_file, replace_text, replace_content) {
@@ -396,7 +441,7 @@ app.post("/signupdata", (req, res) => {
         });
 });
 
-app.post("/editdata", async (req, res) => {
+app.post("/editdata", upload.array("images", 100), async (req, res) => {
     const data = req.body;
 
     //console.log(data);
@@ -420,7 +465,7 @@ app.post("/editdata", async (req, res) => {
                         });
 
                         newProduct_obj.save().then(() => {
-                            res.clearCookie("edit_type", { path: "/" });
+                            //res.clearCookie("edit_type", { path: "/" });
                             res.status(201).json({ message: "Create success" });
                         });
                     });
@@ -501,6 +546,11 @@ app.post("/additemdata/:type/:id", (req, res) => {
         res.status(401);
         res.end();
     }
+});
+
+app.post("/upload", upload.array("images", 5), (req, res) => {
+    const fileUrls = req.files.map((file) => `/uploads/${file.filename}`);
+    res.json({ files: fileUrls });
 });
 
 //give css

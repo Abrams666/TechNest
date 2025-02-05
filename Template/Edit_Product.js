@@ -1,4 +1,8 @@
-const app = Vue.createApp({
+import { createApp } from "vue";
+import App from "./App.vue";
+import axios from "axios";
+
+export default {
     data() {
         return {
             PRODUCTIMGERR_STR: "",
@@ -12,10 +16,12 @@ const app = Vue.createApp({
             productHashtag_input_str: "{% DEFALUT_PRODUCTHASHTAGE_INPUT_STR %}",
             productDescription_input_str: "{% DEFALUT_PRODUCTDES_INPUT_STR %}",
             productDetail_input_str: "{% DEFALUT_PRODUCTDET_INPUT_STR %}",
+            productImg_imgArr: [],
+            previews: [],
         };
     },
     methods: {
-        submit_btn() {
+        async submit_btn() {
             this.PRODUCTIMGERR_STR = "";
             this.PRODUCTNAMEERR_STR = "";
             this.PRODUCTPRICEERR_STR = "";
@@ -35,19 +41,18 @@ const app = Vue.createApp({
             }
 
             if (!is_err) {
-                fetch("/editdata/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name: this.productName_input_str,
-                        price: this.productPrice_input_str,
-                        hashtag: this.productHashtag_input_str,
-                        des: this.productDescription_input_str,
-                        detail: this.productDetail_input_str,
-                    }),
-                })
+                const formData = new FormData();
+                formData.append("name", this.productName_input_str);
+                formData.append("price", this.productPrice_input_str);
+                formData.append("hashtag", this.productHashtag_input_str);
+                formData.append("des", this.productDescription_input_str);
+                formData.append("detail", this.productDetail_input_str);
+                this.productImg_imgArr.forEach((file) => formData.append("images", file));
+
+                await axios
+                    .post("/editdata", formData, {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    })
                     .then((res) => {
                         if (res.status === 201) {
                             window.location.href = "/myshop";
@@ -60,10 +65,15 @@ const app = Vue.createApp({
 
                             window.location.href = "/fail/Require Denied/403";
                         }
-                    })
-                    .catch((error) => console.error("Error:", error));
+                    });
             }
         },
+        handle_img(event) {
+            this.productImg_imgArr = [...event.target.files];
+            this.previews = this.productImg_imgArr.map((file) => URL.createObjectURL(file));
+        },
     },
-});
-app.mount("#editProduct_formId");
+};
+
+createApp(App).mount("#editProduct_formId");
+//app.mount("#editProduct_formId");

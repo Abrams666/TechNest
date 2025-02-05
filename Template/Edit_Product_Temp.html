@@ -38,8 +38,8 @@
                             <p class="err_text">{{ PRODUCTIMGERR_STR }}</p>
                         </div>
                         <div class="editProductContain_divCla">
-                            <input type="file" name="file" />
-                            <img id="show_img_imgId" v-bind:scr="show_img_url" />
+                            <input type="file" multiple @change="handle_img()" accept="image/jpeg,image/png" />
+                            <img v-for="(src, index) in previews" :key="index" :src="src" width="100" /><img id="show_img_imgId" v-bind:scr="show_img_url" />
                         </div>
                     </div>
                     <div class="editProduct_divCla">
