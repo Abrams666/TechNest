@@ -9,7 +9,7 @@ const app = Vue.createApp({
             })
                 .then((res) => {
                     if (res.status === 201) {
-                        window.location.href = `/product/${id}`;
+                        window.location.href = `/product/${id}/1`;
                     } else if (res.status === 401) {
                         window.location.href = "/login";
                     } else if (res.status === 402) {

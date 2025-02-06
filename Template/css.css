@@ -236,6 +236,13 @@ section {
 #details_img {
     width: 40%;
     height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+#details_img {
+    font-size: xx-large;
 }
 #details_img img {
     width: 100%;
