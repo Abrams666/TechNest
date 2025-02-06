@@ -6,7 +6,9 @@ const app = Vue.createApp({
     },
     methods: {
         search() {
-            window.location.href = `/search/${this.search_contain_input}`;
+            if (!(this.search_contain_input === "")) {
+                window.location.href = `/search/${this.search_contain_input}`;
+            }
         },
     },
 });

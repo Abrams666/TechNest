@@ -1,8 +1,4 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import axios from "axios";
-
-export default {
+const app = Vue.createApp({
     data() {
         return {
             PRODUCTIMGERR_STR: "",
@@ -18,6 +14,8 @@ export default {
             productDetail_input_str: "{% DEFALUT_PRODUCTDET_INPUT_STR %}",
             productImg_imgArr: [],
             previews: [],
+            selectedFile: [],
+            message: "",
         };
     },
     methods: {
@@ -47,7 +45,10 @@ export default {
                 formData.append("hashtag", this.productHashtag_input_str);
                 formData.append("des", this.productDescription_input_str);
                 formData.append("detail", this.productDetail_input_str);
-                this.productImg_imgArr.forEach((file) => formData.append("images", file));
+                for (let i = 0; i < this.selectedFile.length; i++) {
+                    formData.append("files", this.selectedFile[i]);
+                }
+                //this.productImg_imgArr.forEach((file) => formData.append("images", file));
 
                 await axios
                     .post("/editdata", formData, {
@@ -69,11 +70,9 @@ export default {
             }
         },
         handle_img(event) {
-            this.productImg_imgArr = [...event.target.files];
-            this.previews = this.productImg_imgArr.map((file) => URL.createObjectURL(file));
+            this.selectedFile = Array.from(event.target.files);
         },
     },
-};
+});
 
-createApp(App).mount("#editProduct_formId");
-//app.mount("#editProduct_formId");
+app.mount("#editProduct_formId");

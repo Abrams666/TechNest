@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+const formidable = require("formidable");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -54,7 +55,7 @@ const product_schema = new mongoose.Schema(
         price: Number,
         owner: Number,
         hashtag: Array,
-        picture_num: Number,
+        picture_ext: Array,
         description: String,
         detail: String,
     },
@@ -78,6 +79,8 @@ const product_model = mongoose.model("product_model", product_schema);
 const item_in_cart_model = mongoose.model("item_in_cart_model", item_in_cart_schema);
 
 //file
+const uploadDir = path.join(__dirname, "/Database/Product_Picture/");
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, "/Database/Product_Picture/");
@@ -215,7 +218,7 @@ app.get("/", (req, res) => {
             }
 
             for (let i = 0; i < max_product_num; i++) {
-                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}`, "View More..."]);
+                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1/${result[i].picture_ext[0]}`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}`, "View More..."]);
             }
 
             output = replacement(output, ["{% PRODUCTS %}"], [cards]);
@@ -236,7 +239,7 @@ app.get("/cart", (req, res) => {
 
                 for (let i = 0; i < result.length; i++) {
                     let result2 = await product_model.find({ id: result[i].product_id });
-                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMPRICE_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}", "{% product_url %}"], [`img/pro/${result[i].product_id}/1`, result2[0].name, result2[0].price * result[i].amount, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id, `product/${result[i].product_id}`]);
+                    cards += replacement(cart_card, ["{% ITEMIMG_URL %}", "{% ITEMNAME_P_STR %}", "{% ITEMPRICE_STR %}", "{% ITEMID_INT %}", "{% ITEMNUM_STR %}", "{% ITEMID_INT %}", "{% ITEMID_INT %}", "{% product_url %}"], [`/img/pro/${result2[0].id}/1/${result2[0].picture_ext[0]}`, result2[0].name, result2[0].price * result[i].amount, result[i].product_id, result[i].amount, result[i].product_id, result[i].product_id, `product/${result[i].product_id}`]);
                 }
 
                 let output = replace_login_status(cart, req, true);
@@ -273,7 +276,7 @@ app.get("/product/:id", (req, res) => {
                 for (let i = 0; i < result[0].hashtag.length; i++) {
                     hashtag_str += `<a href="/search/${result[0].hashtag[i]}">#${result[0].hashtag[i]} ,</a>`;
                 }
-                output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}", "{% PRODUCT_LABELS %}"], [`/img/pro/${id}/1`, result[0].name, result[0].detail, result[0].owner, result[0].price, id, hashtag_str]);
+                output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}", "{% PRODUCT_LABELS %}"], [`/img/pro/${result[0].id}/1/${result[0].picture_ext[0]}`, result[0].name, result[0].detail, result[0].owner, result[0].price, id, hashtag_str]);
 
                 res.setHeader("Content-Type", "text/html");
                 res.writeHead(200);
@@ -328,7 +331,7 @@ app.get("/myshop", (req, res) => {
                 let cards = "";
 
                 for (let i = 0; i < result2.length; i++) {
-                    cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result2[i].id}N1`, result2[i].name, result2[i].description, result2[i].price, `/editproduct/${result2[i].id}`, "Edit..."]);
+                    cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result2[i].id}/1/${result2[i].picture_ext[0]}`, result2[i].name, result2[i].description, result2[i].price, `/editproduct/${result2[i].id}`, "Edit..."]);
                 }
 
                 let output = replace_login_status(myshop, req, true);
@@ -394,7 +397,7 @@ app.get("/search/:contain", (req, res) => {
                 for (let i = max_score_int; i > 0; i--) {
                     for (let j = 0; j < result.length; j++) {
                         if (score_intArr[j] === i) {
-                            cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}N1`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}`, "View More..."]);
+                            cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}/1/${result[j].picture_ext[0]}`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}`, "View More..."]);
                         }
                     }
                 }
@@ -506,34 +509,54 @@ app.post("/signupdata", (req, res) => {
         });
 });
 
-app.post("/editdata", upload.array("images", 100), async (req, res) => {
+app.post("/editdata", async (req, res) => {
     const data = req.body;
-
-    //console.log(data);
 
     if (is_login(req)) {
         if (await check_pwd(req.cookies.id, req.cookies.au4a83)) {
             if (req.cookies.edit_type === "New") {
-                product_model
-                    .find()
-                    .sort({ id: -1 })
-                    .then((result) => {
-                        const newProduct_obj = new product_model({
-                            id: result[0].id + 1,
-                            name: data.name,
-                            price: data.price,
-                            owner: req.cookies.id,
-                            hashtag: split_hashtag(data.hashtag),
-                            picture_num: 1,
-                            description: data.des,
-                            detail: data.detail,
-                        });
+                const form = new formidable.IncomingForm();
+                form.uploadDir = uploadDir;
+                form.keepExtensions = true;
 
-                        newProduct_obj.save().then(() => {
-                            //res.clearCookie("edit_type", { path: "/" });
-                            res.status(201).json({ message: "Create success" });
+                form.parse(req, (err, fields, files) => {
+                    console.log(fields);
+                    console.log(files);
+
+                    product_model
+                        .find()
+                        .sort({ id: -1 })
+                        .then((result) => {
+                            let exts = [];
+
+                            const uploaded_imgArr = files.files;
+
+                            for (let i = 0; i < uploaded_imgArr.length; i++) {
+                                const oldPath = uploaded_imgArr[i].filepath || uploaded_imgArr[i].path;
+                                const newPath = path.join(uploadDir, `${result[0].id + 1}N${i + 1}${path.extname(uploaded_imgArr[i].originalFilename)}`);
+
+                                exts.push(path.extname(uploaded_imgArr[i].originalFilename).toString()[1] + path.extname(uploaded_imgArr[i].originalFilename).toString()[2] + path.extname(uploaded_imgArr[i].originalFilename).toString()[3]);
+
+                                fs.rename(oldPath, newPath, () => {});
+                            }
+
+                            const newProduct_obj = new product_model({
+                                id: result[0].id + 1,
+                                name: fields.name[0],
+                                price: fields.price[0],
+                                owner: req.cookies.id,
+                                hashtag: split_hashtag(fields.hashtag[0]),
+                                picture_ext: exts,
+                                description: fields.des[0],
+                                detail: fields.detail[0],
+                            });
+
+                            newProduct_obj.save().then(() => {
+                                //res.clearCookie("edit_type", { path: "/" });
+                                res.status(201).json({ message: "Create success" });
+                            });
                         });
-                    });
+                });
             } else {
                 product_model
                     .findOneAndUpdate(
@@ -677,10 +700,12 @@ app.get("/img/user/:id", (req, res) => {
     });
 });
 
-app.get("/img/pro/:id/:num", (req, res) => {
+app.get("/img/pro/:id/:num/:type", (req, res) => {
     const id = req.params.id;
     const num = req.params.num;
-    fs.readFile(`./Database/Product_Picture/${id}N${num}.jpg`, (err, data) => {
+    const type = req.params.type;
+
+    fs.readFile(`./Database/Product_Picture/${id}N${num}.${type}`, (err, data) => {
         res.writeHead(200, { "Content-Type": "image/jpg" });
         res.end(data);
     });
