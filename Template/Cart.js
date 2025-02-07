@@ -32,7 +32,9 @@ const app = Vue.createApp({
                 }
             });
         },
-        pay() {},
+        pay() {
+            window.location.href = "/pay";
+        },
     },
 });
 app.mount("#cart_formId");

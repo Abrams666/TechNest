@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <title>TechNest</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet" />
+    </head>
+    <body>
+        <header>
+            <a href="/">
+                <img src="" alt="" />
+                <h1 class="title_h1">Tech</h1>
+                <h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
+            </a>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+                    </li>
+                    <li>
+                        <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+                    </li>
+                    <li>
+                        <a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
+                    </li>
+                    <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section id="pay_secId">
+                <form id="pay_formId">
+                    <div id="credit_divId">
+                        <div id="creditIn_divId">
+                            <div id="name_divId">
+                                <div class="name_divCla">
+                                    <p>First Name</p>
+                                    <input type="text" v-model="first_name_input" v-on:input="update_name" />
+                                </div>
+                                <div class="name_divCla">
+                                    <p>Last Name</p>
+                                    <input type="text" v-model="last_name_input" v-on:input="update_name" />
+                                </div>
+                            </div>
+                            <div id="num_divId">
+                                <p>Card Number</p>
+                                <div id="num_divId_2">
+                                    <input type="text" v-model="num_input_1" ref="num_input_1" v-on:input="update_num_1" />
+                                    <input type="password" v-model="num_input_2" ref="num_input_2" v-on:input="update_num_2" />
+                                    <input type="password" v-model="num_input_3" ref="num_input_3" v-on:input="update_num_3" />
+                                    <input type="text" v-model="num_input_4" ref="num_input_4" v-on:input="update_num_4" />
+                                </div>
+                            </div>
+                            <div id="dateCvv_divId">
+                                <div class="dateCvv_divCla">
+                                    <p>Month(MM)</p>
+                                    <input type="text" v-model="month_input" v-on:input="update_date" maxlength="2" />
+                                </div>
+                                <div class="dateCvv_divCla">
+                                    <p>Year(YYYY)</p>
+                                    <input type="text" v-model="year_input" v-on:input="update_date" maxlength="4" />
+                                </div>
+                                <div class="dateCvv_divCla">
+                                    <p>CVV</p>
+                                    <input type="password" v-model="cvv_input" v-on:input="update_cvv" maxlength="3" />
+                                </div>
+                            </div>
+                            <div id="save_divId">
+                                <input type="checkbox" />
+                                <p>Save this for future payments</p>
+                            </div>
+                        </div>
+                        <div id="creditAn_divId" class="flip" :class="activeBox">
+                            <div v-if="is_flip" id="creditCard_divId" class="flip-front" :class="activeBox">
+                                <div id="creditCard_divId_1">
+                                    <div id="creditCardCom">
+                                        <p id="Tech">Tech</p>
+                                        <p id="Nest">Nest</p>
+                                    </div>
+                                    <img src="/img/sys/6/webp" alt="" />
+                                </div>
+                                <div id="creditCard_divId_2">
+                                    <i class="fa-solid fa-caret-left"></i>
+                                    <img src="/img/sys/5/png" alt="" />
+                                </div>
+                                <div id="creditCard_divId_3">
+                                    <p>{{ cardNum_str }}</p>
+                                </div>
+                                <div id="creditCard_divId_4">
+                                    <p>{{ cardName_str }}</p>
+                                    <p>{{ cardDate_str }}</p>
+                                </div>
+                            </div>
+                            <div v-if="!is_flip" id="creditCardBack_divId" class="flip-back" :class="activeBox">
+                                <div id="blackline_divId"></div>
+                                <div id="nameCvv_divId">
+                                    <img src="/img/sys/7/webp" alt="" />
+                                    <p id="name_pId">{{ cardName_str }}</p>
+                                    <p id="cvv_pId">{{ cardCvv_str }}</p>
+                                </div>
+                                <div id="notice_divId"></div>
+                                <div id="bottom_divId">
+                                    <p>Email:service@technest.com</p>
+                                    <p>Phone:(+886)000000000</p>
+                                    <p>Copyright© 2025 TechNest. All rights reserved.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="Order_divId">{% Order %}</div>
+                    <div id="con_pay_divId">
+                        <div id="delCon_divId">
+                            <div id="delete_divId">
+                                <input type="checkbox" />
+                                <p>Delete them form cart after payment</p>
+                            </div>
+                            <button id="pay_btnId" v-on:click.prevent="pay">Pay Now</button>
+                        </div>
+                        <div id="totalPrice_divId">
+                            <p id="totalPriceTitle_divId">Total:</p>
+                            <p id="totalPriceContain_divId">${% total_price %}</p>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </main>
+        <footer>
+            <div id="footer_div1_1">
+                <div class="footer_div2">
+                    <p>Pages</p>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/cart">Cart</a></li>
+                        <li><a href="/myshop">MyShop</a></li>
+                    </ul>
+                </div>
+                <div class="footer_div2">
+                    <p>Account</p>
+                    <ul>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/signup">Sign Up</a></li>
+                        <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+                    </ul>
+                </div>
+                <div class="footer_div2">
+                    <p>Contact</p>
+                    <ul>
+                        <li><a href="https://www.facebook.com/profile.php?id=100014458966012&locale=zh_TW">Facebook</a></li>
+                        <li><a href="https://www.instagram.com/abrams_66/">Instagram</a></li>
+                        <li>Email:service@technest.com</li>
+                        <li>Phone:(+886)000000000</li>
+                    </ul>
+                </div>
+                <div class="footer_div2">
+                    <p>Other</p>
+                    <ul>
+                        <li><a href="#Policy">Policy</a></li>
+                        <li><a href="https://github.com/Abrams666/TechNest">Source</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="footer_div1_2">
+                <p>Copyright© 2025 TechNest. All rights reserved.</p>
+            </div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+        <script src="/js/Pay"></script>
+    </body>
+</html>

@@ -188,6 +188,8 @@ const cart_card = fs.readFileSync("./Template/Cart_Card_Temp.html", "utf8");
 const product = fs.readFileSync("./Template/Product_Temp.html", "utf8");
 const myshop = fs.readFileSync("./Template/My_Shop.html", "utf8");
 const search = fs.readFileSync("./Template/Search_Temp.html", "utf8");
+const pay = fs.readFileSync("./Template/Pay_Temp.html", "utf8");
+const pay_card = fs.readFileSync("./Template/Pay_Card_Temp.html", "utf8");
 const edit = fs.readFileSync("./Template/Edit_Product_Temp.html", "utf8");
 const setting = fs.readFileSync("./Template/Setting_Temp.html", "utf8");
 const login = fs.readFileSync("./Template/Login_Temp.html", "utf8");
@@ -430,6 +432,41 @@ app.get("/search/:contain", (req, res) => {
         });
 });
 
+app.get("/pay", (req, res) => {
+    if (is_login(req)) {
+        if (check_pwd(req.cookies.id, req.cookies.au4a83)) {
+            item_in_cart_model.find({ owner_id: req.cookies.id }).then(async (result) => {
+                if (result.length > 0) {
+                    let output = replace_login_status(pay, req, true);
+                    let cards = "";
+                    let total_price = 0;
+
+                    for (let i = 0; i < result.length; i++) {
+                        let result2 = await product_model.find({ id: result[i].product_id });
+                        cards += replacement(pay_card, ["{% img_url %}", "{% productName_str %}", "{% productNum_str %}", "{% productPrice_str %}"], [`/img/pro/${result2[0].id}/1/${result2[0].picture_ext[0]}`, result2[0].name, `$${result2[0].price}*${result[i].amount}=`, result2[0].price * result[i].amount]);
+                        total_price += result2[0].price * result[i].amount;
+                    }
+
+                    output = replacement(output, ["{% Order %}", "{% total_price %}"], [cards, total_price]);
+
+                    res.setHeader("Content-Type", "text/html");
+                    res.writeHead(200);
+                    res.end(output);
+                } else {
+                    res.status(403);
+                    res.redirect("/fail/No Product in Cart/403");
+                }
+            });
+        } else {
+            res.status(403);
+            res.redirect("/fail/Forbidden/403");
+        }
+    } else {
+        res.status(401);
+        res.redirect("/fail/Access Denied/401");
+    }
+});
+
 app.get("/login", (req, res) => {
     let output = replace_login_status(login, req, false);
 
@@ -535,9 +572,6 @@ app.post("/editdata", async (req, res) => {
                 form.keepExtensions = true;
 
                 form.parse(req, (err, fields, files) => {
-                    console.log(fields);
-                    console.log(files);
-
                     product_model
                         .find()
                         .sort({ id: -1 })
