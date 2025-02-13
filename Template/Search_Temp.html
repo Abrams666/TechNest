@@ -30,15 +30,23 @@
             </nav>
         </header>
         <main>
-            <section id="result_secId">
-                <form id="result_formId">
-                    <div id="result_divId">
-                        <input type="text" v-model="search_contain_input" />
-                        <button type="submit" v-on:click.prevent="search()">Search</button>
+            <form id="result_formId_2">
+                <section id="result_secId">
+                    <div id="result_formId">
+                        <div id="result_divId">
+                            <input type="text" v-model="search_contain_input" />
+                            <button type="submit" v-on:click.prevent="search()">Search</button>
+                        </div>
                     </div>
-                </form>
-            </section>
-            <section id="product">{% PRODUCTS %}</section>
+                </section>
+                <section id="product">{% PRODUCTS %}</section>
+                <section id="change_page_secId">
+                    <a href="{% last_page_url %}"><i class="fa-solid fa-chevron-left"></i></a>
+                    <input type="text" value="{% now_page_input %}" v-on:keyup.enter="change_page" />
+                    <p>/{% total_pageNum_str %}</p>
+                    <a href="{% next_page_url %}"><i class="fa-solid fa-chevron-right"></i></a>
+                </section>
+            </form>
         </main>
         <footer>
             <div id="footer_div1_1">

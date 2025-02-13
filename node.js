@@ -19,6 +19,9 @@ app.use(express.static("uploads"));
 //config
 dotenv.config({ path: "./config.env" });
 
+const home_max_product_num = 20;
+const search_max_product_num = 2;
+
 //db connect
 const DCS = process.env.DATABASE_CONNECTION_STRING.replace("<db_password>", process.env.DATABASE_PASSWORD);
 mongoose
@@ -212,8 +215,8 @@ app.get("/", (req, res) => {
         .find()
         .sort({ id: -1 })
         .then((result) => {
-            let max_product_num = 20;
             let cards = "";
+            let max_product_num = home_max_product_num;
 
             if (result.length < max_product_num) {
                 max_product_num = result.length;
@@ -291,7 +294,7 @@ app.get("/product/:id/:n", (req, res) => {
                 }
 
                 for (let i = 0; i < result[0].hashtag.length; i++) {
-                    hashtag_str += `<a href="/search/${result[0].hashtag[i]}">#${result[0].hashtag[i]} ,</a>`;
+                    hashtag_str += `<a href="/search/1/${result[0].hashtag[i]}">#${result[0].hashtag[i]} ,</a>`;
                 }
                 output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}", "{% PRODUCT_LABELS %}", "{% last_productImg_url %}", "{% next_productImg_url %}"], [`/img/pro/${result[0].id}/${n}/${result[0].picture_ext[n * 1 - 1]}`, result[0].name, result[0].detail, result[0].owner, result[0].price, id, hashtag_str, `/product/${id}/${last_n}`, `/product/${id}/${next_n}`]);
 
@@ -377,59 +380,128 @@ app.get("/setting", (req, res) => {
     }
 });
 
-app.get("/search/:contain", (req, res) => {
-    const contain = split_hashtag(req.params.contain);
-    const search_conditions = {
-        $or: [{ name: { $regex: contain.join("|"), $options: "i" } }, { hashtag: { $in: contain } }],
-    };
+app.get("/search/:page/:contain?", (req, res) => {
+    let page = req.params.page * 1;
+    let max_product_num = search_max_product_num;
+    let cards = "";
+    let output = "";
 
-    product_model
-        .find(search_conditions)
-        .sort({ id: -1 })
-        .then((result) => {
-            let output = "";
+    if (req.params.contain) {
+        const contain = split_hashtag(req.params.contain);
 
-            if (!(result.length === 0)) {
-                let score_intArr = [];
-                let max_score_int = 0;
-                let cards = "";
+        const search_conditions = {
+            $or: [{ name: { $regex: contain.join("|"), $options: "i" } }, { hashtag: { $in: contain } }],
+        };
 
-                for (let i = 0; i < result.length; i++) {
-                    score_intArr.push(0);
+        product_model
+            .find(search_conditions)
+            .sort({ id: -1 })
+            .then((result) => {
+                if (!(result.length === 0)) {
+                    let score_intArr = [];
+                    let max_score_int = 0;
 
-                    for (let j = 0; j < result[i].hashtag.length; j++) {
-                        if (contain.includes(result[i].hashtag[j])) {
+                    for (let i = 0; i < result.length; i++) {
+                        score_intArr.push(0);
+
+                        for (let j = 0; j < result[i].hashtag.length; j++) {
+                            if (contain.includes(result[i].hashtag[j])) {
+                                score_intArr[i] += 1;
+                            }
+                        }
+                        if (contain.some((item) => result[i].name.includes(item))) {
                             score_intArr[i] += 1;
                         }
-                    }
-                    if (contain.some((item) => result[i].name.includes(item))) {
-                        score_intArr[i] += 1;
-                    }
 
-                    if (score_intArr[i] > max_score_int) {
-                        max_score_int = score_intArr[i];
-                    }
-                }
-
-                for (let i = max_score_int; i > 0; i--) {
-                    for (let j = 0; j < result.length; j++) {
-                        if (score_intArr[j] === i) {
-                            cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}/1/${result[j].picture_ext[0]}`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}/1`, "View More..."]);
+                        if (score_intArr[i] > max_score_int) {
+                            max_score_int = score_intArr[i];
                         }
                     }
+
+                    let start = max_product_num * (page - 1);
+                    let end = Math.min(max_product_num * page, result.length);
+                    let count_product = 0;
+
+                    console.log(start);
+                    console.log(end);
+
+                    for (let i = max_score_int; i > 0; i--) {
+                        for (let j = 0; j < result.length; j++) {
+                            if (score_intArr[j] === i) {
+                                if (count_product >= start && count_product < end) {
+                                    cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}/1/${result[j].picture_ext[0]}`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}/1`, "View More..."]);
+                                }
+
+                                count_product++;
+                            }
+                        }
+                    }
+
+                    let last_page_num = page - 1;
+                    let next_page_num = page + 1;
+                    if (page === 1) {
+                        last_page_num = 1;
+                    }
+                    if (page === Math.ceil(result.length / max_product_num)) {
+                        next_page_num = Math.ceil(result.length / max_product_num);
+                    }
+
+                    output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], [cards, `/search/${last_page_num}/${contain}`, `/search/${next_page_num}/${contain}`, page, Math.ceil(result.length / max_product_num)]);
+                } else {
+                    output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], ["No products found", `/`, "/", "1", "1"]);
                 }
-                output = replacement(search, ["{% PRODUCTS %}"], [cards]);
-            } else {
-                output = replacement(search, ["{% PRODUCTS %}"], ["No products found"]);
-            }
 
-            output = replace_login_status(output, req, is_login(req));
-            output = replacement(output, ["{% contain %}"], [req.params.contain]);
+                output = replace_login_status(output, req, is_login(req));
+                output = replacement(output, ["{% contain %}"], [req.params.contain]);
 
-            res.setHeader("Content-Type", "text/html");
-            res.writeHead(200);
-            res.end(output);
-        });
+                res.setHeader("Content-Type", "text/html");
+                res.writeHead(200);
+                res.end(output);
+            });
+    } else {
+        product_model
+            .find()
+            .sort({ id: -1 })
+            .then((result) => {
+                if (max_product_num * (page - 1) > result.length || page <= 0) {
+                    res.status(403);
+                    res.redirect("/fail/Access Denied/403");
+                    return;
+                }
+
+                if (result.length > 0) {
+                    let start = max_product_num * (page - 1);
+                    let end = Math.min(max_product_num * page, result.length);
+
+                    console.log(start);
+                    console.log(end);
+
+                    for (let i = start; i < end; i++) {
+                        cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1/${result[i].picture_ext[0]}`, result[i].name, result[i].detail, result[i].price, `/product/${result[i].id}/1`, "View More..."]);
+                    }
+
+                    let last_page_num = page - 1;
+                    let next_page_num = page + 1;
+                    if (page === 1) {
+                        last_page_num = 1;
+                    }
+                    if (page === Math.ceil(result.length / max_product_num)) {
+                        next_page_num = Math.ceil(result.length / max_product_num);
+                    }
+
+                    output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], [cards, `/search/${last_page_num}/`, `/search/${next_page_num}/`, page, Math.ceil(result.length / max_product_num)]);
+                } else {
+                    output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], ["No products found", `/`, "/", "1", "1"]);
+                }
+
+                output = replace_login_status(output, req, is_login(req));
+                output = replacement(output, ["{% contain %}"], [""]);
+
+                res.setHeader("Content-Type", "text/html");
+                res.writeHead(200);
+                res.end(output);
+            });
+    }
 });
 
 app.get("/pay", (req, res) => {
@@ -700,7 +772,7 @@ app.get("/css", (req, res) => {
 //give js
 app.get("/js/:filename/:id?", (req, res) => {
     const filename = req.params.filename;
-    const id = req.params.id;
+    let id = req.params.id;
 
     fs.readFile(`./Template/${filename}.js`, (err, data) => {
         if (filename === "Edit_Product" && id) {
@@ -719,7 +791,10 @@ app.get("/js/:filename/:id?", (req, res) => {
 
             res.writeHead(200, { "Content-Type": "text/javascript" });
             res.end(data);
-        } else if (filename === "Search" && id) {
+        } else if (filename === "Search") {
+            if (!id) {
+                id = "";
+            }
             data = replacement(data, ["{% search_contain_str %}"], [id]);
 
             res.writeHead(200, { "Content-Type": "text/javascript" });
