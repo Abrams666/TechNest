@@ -15,4 +15,4 @@ const app = Vue.createApp({
         },
     },
 });
-app.mount("#result_formId");
+app.mount("#result_formId_2");
