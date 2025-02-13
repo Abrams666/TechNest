@@ -182,6 +182,61 @@ function arr_to_str(arr) {
     return str;
 }
 
+function search_engin(search_str, start, exp_end, forbid, callback) {
+    const contain = split_hashtag(search_str);
+
+    const search_conditions = {
+        $or: [{ name: { $regex: contain.join("|"), $options: "i" } }, { hashtag: { $in: contain } }],
+    };
+
+    product_model
+        .find(search_conditions)
+        .sort({ id: -1 })
+        .then((result) => {
+            if (!(result.length === 0)) {
+                let score_intArr = [];
+                let max_score_int = 0;
+
+                for (let i = 0; i < result.length; i++) {
+                    score_intArr.push(0);
+
+                    for (let j = 0; j < result[i].hashtag.length; j++) {
+                        if (contain.includes(result[i].hashtag[j])) {
+                            score_intArr[i] += 1;
+                        }
+                    }
+                    if (contain.some((item) => result[i].name.includes(item))) {
+                        score_intArr[i] += 1;
+                    }
+
+                    if (score_intArr[i] > max_score_int) {
+                        max_score_int = score_intArr[i];
+                    }
+                }
+
+                let end = Math.min(exp_end, result.length);
+                let count_product = 0;
+                let cards = "";
+
+                for (let i = max_score_int; i > 0; i--) {
+                    for (let j = 0; j < result.length; j++) {
+                        if (score_intArr[j] === i && result[j].id !== forbid) {
+                            if (count_product >= start && count_product < end) {
+                                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}/1/${result[j].picture_ext[0]}`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}/1`, "View More..."]);
+                            }
+
+                            count_product++;
+                        }
+                    }
+                }
+
+                callback(cards, result, contain);
+            } else {
+                callback("No product found...", result, contain);
+            }
+        });
+}
+
 //read file
 const css = fs.readFileSync("./Template/css.css", "utf8");
 const home_page = fs.readFileSync("./Template/HomePage_Temp.html", "utf8");
@@ -223,7 +278,9 @@ app.get("/", (req, res) => {
             }
 
             for (let i = 0; i < max_product_num; i++) {
-                cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1/${result[i].picture_ext[0]}`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}/1`, "View More..."]);
+                if (result[i].id !== 1) {
+                    cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1/${result[i].picture_ext[0]}`, result[i].name, result[i].description, result[i].price, `/product/${result[i].id}/1`, "View More..."]);
+                }
             }
 
             output = replacement(output, ["{% PRODUCTS %}"], [cards]);
@@ -293,14 +350,20 @@ app.get("/product/:id/:n", (req, res) => {
                     next_n = n * 1 + 1;
                 }
 
+                let search_contain = result[0].name;
                 for (let i = 0; i < result[0].hashtag.length; i++) {
                     hashtag_str += `<a href="/search/1/${result[0].hashtag[i]}">#${result[0].hashtag[i]} ,</a>`;
+                    search_contain += ` ${result[0].hashtag[i]}`;
                 }
                 output = replacement(output, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DETAILS %}", "{% PRODUCT_OWNER %}", "{% PRODUCT_PRICE %}", "{% PRODUCT_ID %}", "{% PRODUCT_LABELS %}", "{% last_productImg_url %}", "{% next_productImg_url %}"], [`/img/pro/${result[0].id}/${n}/${result[0].picture_ext[n * 1 - 1]}`, result[0].name, result[0].detail, result[0].owner, result[0].price, id, hashtag_str, `/product/${id}/${last_n}`, `/product/${id}/${next_n}`]);
 
-                res.setHeader("Content-Type", "text/html");
-                res.writeHead(200);
-                res.end(output);
+                search_engin(search_contain, 0, 20, result[0].id * 1, (cards, result2, contain) => {
+                    output = replacement(output, ["{% PRODUCTS %}", "{% view_moreContain_str %}"], [cards, search_contain]);
+
+                    res.setHeader("Content-Type", "text/html");
+                    res.writeHead(200);
+                    res.end(output);
+                });
             } else {
                 res.status(404);
                 res.redirect("/notfound");
@@ -387,77 +450,28 @@ app.get("/search/:page/:contain?", (req, res) => {
     let output = "";
 
     if (req.params.contain) {
-        const contain = split_hashtag(req.params.contain);
+        let start = max_product_num * (page - 1);
+        let end = max_product_num * page;
 
-        const search_conditions = {
-            $or: [{ name: { $regex: contain.join("|"), $options: "i" } }, { hashtag: { $in: contain } }],
-        };
+        search_engin(req.params.contain, start, end, 1, (cards, result, contain) => {
+            let last_page_num = page - 1;
+            let next_page_num = page + 1;
 
-        product_model
-            .find(search_conditions)
-            .sort({ id: -1 })
-            .then((result) => {
-                if (!(result.length === 0)) {
-                    let score_intArr = [];
-                    let max_score_int = 0;
+            if (page === 1) {
+                last_page_num = 1;
+            }
+            if (page === Math.ceil(result.length / max_product_num)) {
+                next_page_num = Math.ceil(result.length / max_product_num);
+            }
 
-                    for (let i = 0; i < result.length; i++) {
-                        score_intArr.push(0);
+            output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], [cards, `/search/${last_page_num}/${contain}`, `/search/${next_page_num}/${contain}`, page, Math.ceil(result.length / max_product_num)]);
 
-                        for (let j = 0; j < result[i].hashtag.length; j++) {
-                            if (contain.includes(result[i].hashtag[j])) {
-                                score_intArr[i] += 1;
-                            }
-                        }
-                        if (contain.some((item) => result[i].name.includes(item))) {
-                            score_intArr[i] += 1;
-                        }
-
-                        if (score_intArr[i] > max_score_int) {
-                            max_score_int = score_intArr[i];
-                        }
-                    }
-
-                    let start = max_product_num * (page - 1);
-                    let end = Math.min(max_product_num * page, result.length);
-                    let count_product = 0;
-
-                    console.log(start);
-                    console.log(end);
-
-                    for (let i = max_score_int; i > 0; i--) {
-                        for (let j = 0; j < result.length; j++) {
-                            if (score_intArr[j] === i) {
-                                if (count_product >= start && count_product < end) {
-                                    cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[j].id}/1/${result[j].picture_ext[0]}`, result[j].name, result[j].detail, result[j].price, `/product/${result[j].id}/1`, "View More..."]);
-                                }
-
-                                count_product++;
-                            }
-                        }
-                    }
-
-                    let last_page_num = page - 1;
-                    let next_page_num = page + 1;
-                    if (page === 1) {
-                        last_page_num = 1;
-                    }
-                    if (page === Math.ceil(result.length / max_product_num)) {
-                        next_page_num = Math.ceil(result.length / max_product_num);
-                    }
-
-                    output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], [cards, `/search/${last_page_num}/${contain}`, `/search/${next_page_num}/${contain}`, page, Math.ceil(result.length / max_product_num)]);
-                } else {
-                    output = replacement(search, ["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"], ["No products found", `/`, "/", "1", "1"]);
-                }
-
-                output = replace_login_status(output, req, is_login(req));
-                output = replacement(output, ["{% contain %}"], [req.params.contain]);
-
-                res.setHeader("Content-Type", "text/html");
-                res.writeHead(200);
-                res.end(output);
-            });
+            output = replace_login_status(output, req, is_login(req));
+            output = replacement(output, ["{% contain %}"], [req.params.contain]);
+            res.setHeader("Content-Type", "text/html");
+            res.writeHead(200);
+            res.end(output);
+        });
     } else {
         product_model
             .find()
@@ -472,9 +486,6 @@ app.get("/search/:page/:contain?", (req, res) => {
                 if (result.length > 0) {
                     let start = max_product_num * (page - 1);
                     let end = Math.min(max_product_num * page, result.length);
-
-                    console.log(start);
-                    console.log(end);
 
                     for (let i = start; i < end; i++) {
                         cards += replacement(home_page_card, ["{% PRODUCT_MAIN_IMG %}", "{% PRODUCT_NAME %}", "{% PRODUCT_DESCRIPTION %}", "{% PRODUCT_PICE %}", "{% PRODUCT_LINK %}", "{% LINK_TITLE %}"], [`/img/pro/${result[i].id}/1/${result[i].picture_ext[0]}`, result[i].name, result[i].detail, result[i].price, `/product/${result[i].id}/1`, "View More..."]);
