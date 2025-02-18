@@ -1,139 +1,195 @@
 <!DOCTYPE html>
 <html>
-    <head lang="en">
-        <title>TechNest</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="/css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
-    <body>
-        <header>
-            <a href="/">
-                <img src="" alt="" />
-                <h1 class="title_h1">Tech</h1>
-                <h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
-            </a>
-            <nav>
-                <ul>
-                    <li>
-                        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
-                    </li>
-                    <li>
-                        <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-                    </li>
-                    <li>
-                        <a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
-                    </li>
-                    <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
-                </ul>
-            </nav>
-        </header>
-        <main>
-            <section id="setting_sec">
-                <form id="setting_form">
-                    <div class="setting_tr">
-                        <div class="setting_th_title">Logout</div>
-                        <div class="setting_th_contain">
-                            <button class="setting_btn" v-on:click.prevent="logout()">Logout</button>
-                        </div>
-                    </div>
-                    <div class="setting_tr">
-                        <div class="setting_th_title">Account</div>
-                        <div class="setting_th_contain">
-                            <div class="setting_div">
-                                <p>Password:</p>
-                                <input type="password" v-model="pwd" />
-                            </div>
-                            <button class="setting_btn" v-on:click.prevent="change_pwd()">Update</button>
-                        </div>
-                    </div>
-                    <div class="setting_tr">
-                        <div class="setting_th_title">Info</div>
-                        <div class="setting_th_contain">
-                            <div class="setting_div">
-                                <p>Your Name:</p>
-                                <input type="text" v-model="name" />
-                            </div>
-                            <div class="setting_div">
-                                <p>Shop Name:</p>
-                                <input type="text" v-model="shop" />
-                            </div>
-                            <button class="setting_btn" v-on:click.prevent="change_info()">Update</button>
-                        </div>
-                    </div>
-                    <div class="setting_tr">
-                        <div class="setting_th_title">Danger</div>
-                        <div class="setting_th_contain">
-                            <button class="setting_btn" id="danger_btn" v-on:click.prevent="delete_acc()">Delete Account</button>
-                        </div>
-                    </div>
-                    <div class="check_div" id="check_pwd_div">
-                        <div class="check_close">
-                            <button class="close_btn" v-on:click.prevent="check_pwd_close()"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                        <div class="check_contain">
-                            <div>
-                                <p>Old Password:</p>
-                                <p class="err_text">{{ OLD_PASS_ERR }}</p>
-                            </div>
-                            <input type="password" v-model="old_pwd" />
-                        </div>
-                        <div class="check_contain">
-                            <div>
-                                <p>Confirm New Password:</p>
-                                <p class="err_text">{{ CON_PASS_ERR }}</p>
-                            </div>
-                            <input type="password" v-model="con_pwd" />
-                        </div>
-                        <div class="check_submit">
-                            <button v-on:click.prevent="check_pwd_submit()">Submit</button>
-                        </div>
-                        <div class="check_bottom"></div>
-                    </div>
-                </form>
-            </section>
-        </main>
-        <footer>
-            <div id="footer_div1_1">
-                <div class="footer_div2">
-                    <p>Pages</p>
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/cart">Cart</a></li>
-                        <li><a href="/myshop">MyShop</a></li>
-                    </ul>
-                </div>
-                <div class="footer_div2">
-                    <p>Account</p>
-                    <ul>
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/signup">Sign Up</a></li>
-                        <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
-                    </ul>
-                </div>
-                <div class="footer_div2">
-                    <p>Contact</p>
-                    <ul>
-                        <li><a href="https://www.facebook.com/profile.php?id=100014458966012&locale=zh_TW">Facebook</a></li>
-                        <li><a href="https://www.instagram.com/abrams_66/">Instagram</a></li>
-                        <li>Email:service@technest.com</li>
-                        <li>Phone:(+886)000000000</li>
-                    </ul>
-                </div>
-                <div class="footer_div2">
-                    <p>Other</p>
-                    <ul>
-                        <li><a href="#Policy">Policy</a></li>
-                        <li><a href="https://github.com/Abrams666/TechNest">Source</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div id="footer_div1_2">
-                <p>Copyright© 2025 TechNest. All rights reserved.</p>
-            </div>
-        </footer>
-        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
-        <script src="/js/Setting"></script>
-    </body>
+	<head lang="en">
+		<title>TechNest</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+			integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+	</head>
+	<body>
+		<header>
+			<a href="/">
+				<img src="" alt="" />
+				<h1 class="title_h1">Tech</h1>
+				<h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
+			</a>
+			<nav>
+				<ul>
+					<li>
+						<a href="/"><i class="fa-solid fa-house"></i> Home</a>
+					</li>
+					<li>
+						<a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+					</li>
+					<li>
+						<a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
+					</li>
+					<li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+				</ul>
+			</nav>
+		</header>
+		<main>
+			<section id="setting_sec">
+				<form id="setting_form">
+					<div class="setting_tr">
+						<div class="setting_th_title">Logout</div>
+						<div class="setting_th_contain">
+							<button class="setting_btn" v-on:click.prevent="logout">Logout</button>
+						</div>
+					</div>
+					<div class="setting_tr">
+						<div class="setting_th_title">Account</div>
+						<div class="setting_th_contain">
+							<button class="setting_btn" v-on:click.prevent="change_pwd">Change Password</button>
+						</div>
+					</div>
+					<div class="setting_tr">
+						<div class="setting_th_title">Info</div>
+						<div class="setting_th_contain">
+							<div class="setting_div">
+								<p>Your Name:</p>
+								<input type="text" v-model="name" />
+							</div>
+							<div class="setting_div">
+								<p>Shop Name:</p>
+								<input type="text" v-model="shop" />
+							</div>
+							<button class="setting_btn" v-on:click.prevent="change_info">Update</button>
+						</div>
+					</div>
+					<div class="setting_tr">
+						<div class="setting_th_title">Danger</div>
+						<div class="setting_th_contain">
+							<button class="setting_btn" id="danger_btn" v-on:click.prevent="delete_acc">Delete Account</button>
+						</div>
+					</div>
+					<div v-if="change_pwd_window" class="check_div" id="check_pwd_div">
+						<div class="check_close">
+							<button class="close_btn" v-on:click.prevent="check_pwd_close">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+						<div class="check_contain">
+							<div>
+								<p>Old Password:</p>
+								<p class="err_text">{{ OLD_PASS_ERR }}</p>
+							</div>
+							<input type="password" v-model="old_pwd" />
+						</div>
+						<div class="check_contain">
+							<div>
+								<p>New Password:</p>
+								<p class="err_text">{{ NEW_PASS_ERR }}</p>
+							</div>
+							<input type="password" v-model="new_pwd" />
+						</div>
+						<div class="check_contain">
+							<div>
+								<p>Confirm New Password:</p>
+								<p class="err_text">{{ CON_PASS_ERR }}</p>
+							</div>
+							<input type="password" v-model="con_pwd" />
+						</div>
+						<div class="check_submit">
+							<button v-on:click.prevent="check_pwd_submit">Submit</button>
+						</div>
+						<div class="check_bottom"></div>
+					</div>
+					<div v-if="change_info_window" class="check_div" id="check_info_div">
+						<div class="check_close">
+							<button class="close_btn" v-on:click.prevent="check_info_close">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+						<div class="check_contain">
+							<div>
+								<p>Password:</p>
+								<p class="err_text">{{ PASS_ERR }}</p>
+							</div>
+							<input type="password" v-model="info_pwd" />
+						</div>
+						<div class="check_submit">
+							<button v-on:click.prevent="check_info_submit">Submit</button>
+						</div>
+						<div class="check_bottom"></div>
+					</div>
+					<div v-if="delete_acc_window" class="check_div" id="delete_acc_div">
+						<div class="check_close">
+							<button class="close_btn" v-on:click.prevent="delete_acc_close">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+						<div class="check_contain">
+							<div>
+								<p>Password:</p>
+								<p class="err_text">{{ DEL_PASS_ERR }}</p>
+							</div>
+							<input type="password" v-model="del_pwd" />
+						</div>
+						<div class="check_contain">
+							<div>
+								<p>Enter:I want to delete my account.</p>
+								<p class="err_text">{{ WORD_ERR }}</p>
+							</div>
+							<input type="text" v-model="word_str" />
+						</div>
+						<div class="check_submit">
+							<button v-on:click.prevent="check_delete_acc_submit">Submit</button>
+						</div>
+						<div class="check_bottom"></div>
+					</div>
+				</form>
+			</section>
+		</main>
+		<footer>
+			<div id="footer_div1_1">
+				<div class="footer_div2">
+					<p>Pages</p>
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/cart">Cart</a></li>
+						<li><a href="/myshop">MyShop</a></li>
+					</ul>
+				</div>
+				<div class="footer_div2">
+					<p>Account</p>
+					<ul>
+						<li><a href="/login">Login</a></li>
+						<li><a href="/signup">Sign Up</a></li>
+						<li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+					</ul>
+				</div>
+				<div class="footer_div2">
+					<p>Contact</p>
+					<ul>
+						<li>
+							<a href="https://www.facebook.com/profile.php?id=100014458966012&locale=zh_TW">Facebook</a>
+						</li>
+						<li><a href="https://www.instagram.com/abrams_66/">Instagram</a></li>
+						<li>Email:service@technest.com</li>
+						<li>Phone:(+886)000000000</li>
+					</ul>
+				</div>
+				<div class="footer_div2">
+					<p>Other</p>
+					<ul>
+						<li><a href="#Policy">Policy</a></li>
+						<li><a href="https://github.com/Abrams666/TechNest">Source</a></li>
+					</ul>
+				</div>
+			</div>
+			<div id="footer_div1_2">
+				<p>Copyright© 2025 TechNest. All rights reserved.</p>
+			</div>
+		</footer>
+		<script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+		<script src="/js/Setting"></script>
+	</body>
 </html>

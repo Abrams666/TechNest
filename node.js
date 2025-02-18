@@ -23,10 +23,7 @@ const home_max_product_num = 20;
 const search_max_product_num = 2;
 
 //db connect
-const DCS = process.env.DATABASE_CONNECTION_STRING.replace(
-	"<db_password>",
-	process.env.DATABASE_PASSWORD
-);
+const DCS = process.env.DATABASE_CONNECTION_STRING.replace("<db_password>", process.env.DATABASE_PASSWORD);
 mongoose
 	.connect(DCS, {
 		useNewUrlParser: true,
@@ -159,12 +156,7 @@ function replace_login_status(origin_file, req, is_login) {
 		return replacement(
 			origin_file,
 			["{% USER %}", "{% SETTINGORLOGIN %}", "{% USER %}", "{% SETTINGORLOGIN %}"],
-			[
-				`<i class='fa-solid fa-user'></i> ${req.cookies.name}`,
-				`/setting`,
-				"Setting",
-				"/setting",
-			]
+			[`<i class='fa-solid fa-user'></i> ${req.cookies.name}`, `/setting`, "Setting", "/setting"]
 		);
 	} else {
 		return replacement(
@@ -202,10 +194,7 @@ function search_engin(search_str, start, exp_end, forbid, callback) {
 	const contain = split_hashtag(search_str);
 
 	const search_conditions = {
-		$or: [
-			{ name: { $regex: contain.join("|"), $options: "i" } },
-			{ hashtag: { $in: contain } },
-		],
+		$or: [{ name: { $regex: contain.join("|"), $options: "i" } }, { hashtag: { $in: contain } }],
 	};
 
 	product_model
@@ -461,11 +450,7 @@ app.get("/product/:id/:n", (req, res) => {
 				);
 
 				search_engin(search_contain, 0, 20, result[0].id * 1, (cards, result2, contain) => {
-					output = replacement(
-						output,
-						["{% PRODUCTS %}", "{% view_moreContain_str %}"],
-						[cards, search_contain]
-					);
+					output = replacement(output, ["{% PRODUCTS %}", "{% view_moreContain_str %}"], [cards, search_contain]);
 
 					res.setHeader("Content-Type", "text/html");
 					res.writeHead(200);
@@ -543,11 +528,7 @@ app.get("/myshop", (req, res) => {
 				}
 
 				let output = replace_login_status(myshop, req, true);
-				output = replacement(
-					output,
-					["{% SHOP_NAME %}", "{% PRODUCTS %}"],
-					[req.cookies.shop_name, cards]
-				);
+				output = replacement(output, ["{% SHOP_NAME %}", "{% PRODUCTS %}"], [req.cookies.shop_name, cards]);
 
 				res.setHeader("Content-Type", "text/html");
 				res.writeHead(200);
@@ -595,13 +576,7 @@ app.get("/search/:page/:contain?", (req, res) => {
 
 			output = replacement(
 				search,
-				[
-					"{% PRODUCTS %}",
-					"{% last_page_url %}",
-					"{% next_page_url %}",
-					"{% now_page_input %}",
-					"{% total_pageNum_str %}",
-				],
+				["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"],
 				[
 					cards,
 					`/search/${last_page_num}/${contain}`,
@@ -667,31 +642,13 @@ app.get("/search/:page/:contain?", (req, res) => {
 
 					output = replacement(
 						search,
-						[
-							"{% PRODUCTS %}",
-							"{% last_page_url %}",
-							"{% next_page_url %}",
-							"{% now_page_input %}",
-							"{% total_pageNum_str %}",
-						],
-						[
-							cards,
-							`/search/${last_page_num}/`,
-							`/search/${next_page_num}/`,
-							page,
-							Math.ceil(result.length / max_product_num),
-						]
+						["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"],
+						[cards, `/search/${last_page_num}/`, `/search/${next_page_num}/`, page, Math.ceil(result.length / max_product_num)]
 					);
 				} else {
 					output = replacement(
 						search,
-						[
-							"{% PRODUCTS %}",
-							"{% last_page_url %}",
-							"{% next_page_url %}",
-							"{% now_page_input %}",
-							"{% total_pageNum_str %}",
-						],
+						["{% PRODUCTS %}", "{% last_page_url %}", "{% next_page_url %}", "{% now_page_input %}", "{% total_pageNum_str %}"],
 						["No products found", `/`, "/", "1", "1"]
 					);
 				}
@@ -721,12 +678,7 @@ app.get("/pay", (req, res) => {
 						});
 						cards += replacement(
 							pay_card,
-							[
-								"{% img_url %}",
-								"{% productName_str %}",
-								"{% productNum_str %}",
-								"{% productPrice_str %}",
-							],
+							["{% img_url %}", "{% productName_str %}", "{% productNum_str %}", "{% productPrice_str %}"],
 							[
 								`/img/pro/${result2[0].id}/1/${result2[0].picture_ext[0]}`,
 								result2[0].name,
@@ -737,11 +689,7 @@ app.get("/pay", (req, res) => {
 						total_price += result2[0].price * result[i].amount;
 					}
 
-					output = replacement(
-						output,
-						["{% Order %}", "{% total_price %}"],
-						[cards, total_price]
-					);
+					output = replacement(output, ["{% Order %}", "{% total_price %}"], [cards, total_price]);
 
 					res.setHeader("Content-Type", "text/html");
 					res.writeHead(200);
@@ -883,25 +831,16 @@ app.post("/editdata", async (req, res) => {
 							const uploaded_imgArr = files.files;
 
 							for (let i = 0; i < uploaded_imgArr.length; i++) {
-								const oldPath =
-									uploaded_imgArr[i].filepath || uploaded_imgArr[i].path;
+								const oldPath = uploaded_imgArr[i].filepath || uploaded_imgArr[i].path;
 								const newPath = path.join(
 									uploadDir,
-									`${result[0].id + 1}N${i + 1}${path.extname(
-										uploaded_imgArr[i].originalFilename
-									)}`
+									`${result[0].id + 1}N${i + 1}${path.extname(uploaded_imgArr[i].originalFilename)}`
 								);
 
 								exts.push(
-									path
-										.extname(uploaded_imgArr[i].originalFilename)
-										.toString()[1] +
-										path
-											.extname(uploaded_imgArr[i].originalFilename)
-											.toString()[2] +
-										path
-											.extname(uploaded_imgArr[i].originalFilename)
-											.toString()[3]
+									path.extname(uploaded_imgArr[i].originalFilename).toString()[1] +
+										path.extname(uploaded_imgArr[i].originalFilename).toString()[2] +
+										path.extname(uploaded_imgArr[i].originalFilename).toString()[3]
 								);
 
 								fs.rename(oldPath, newPath, () => {});
@@ -1050,6 +989,116 @@ app.post("/upload", upload.array("images", 5), (req, res) => {
 	res.json({ files: fileUrls });
 });
 
+app.post("/changepwd", async (req, res) => {
+	const data = req.body;
+
+	if (!is_login(req)) {
+		res.status(401);
+		res.end();
+
+		return;
+	}
+	if (!(await check_pwd(req.cookies.id, req.cookies.au4a83))) {
+		res.status(403);
+		res.end();
+
+		return;
+	}
+	if (!(await check_pwd(req.cookies.id, data.old_pwd))) {
+		res.status(402);
+		res.end();
+
+		return;
+	}
+
+	user_model.findOneAndUpdate({ id: req.cookies.id }, { $set: { password: data.new_pwd } }).then(() => {
+		res.cookie("au4a83", data.new_pwd, { maxAge: 86400000 });
+		res.status(201);
+		res.end();
+	});
+});
+
+app.post("/changeinfo", async (req, res) => {
+	const data = req.body;
+
+	if (!is_login(req)) {
+		res.status(401);
+		res.end();
+
+		return;
+	}
+	if (!(await check_pwd(req.cookies.id, req.cookies.au4a83))) {
+		res.status(403);
+		res.end();
+
+		return;
+	}
+	if (!(await check_pwd(req.cookies.id, data.pwd))) {
+		res.status(402);
+		res.end();
+
+		return;
+	}
+
+	if (data.type === "both") {
+		user_model.findOneAndUpdate({ id: req.cookies.id }, { $set: { name: data.name, shop_name: data.shop } }).then(() => {
+			res.cookie("name", data.name, { maxAge: 86400000 });
+			res.cookie("shop_name", data.shop, { maxAge: 86400000 });
+			res.status(201);
+			res.end();
+		});
+	} else if (data.type === "name") {
+		user_model.findOneAndUpdate({ id: req.cookies.id }, { $set: { name: data.name } }).then(() => {
+			res.cookie("name", data.name, { maxAge: 86400000 });
+			res.status(201);
+			res.end();
+		});
+	} else if (data.type === "shop") {
+		user_model.findOneAndUpdate({ id: req.cookies.id }, { $set: { shop_name: data.shop } }).then(() => {
+			res.cookie("shop_name", data.shop, { maxAge: 86400000 });
+			res.status(201);
+			res.end();
+		});
+	}
+});
+
+app.post("/deleteacc", async (req, res) => {
+	const data = req.body;
+
+	if (!is_login(req)) {
+		res.status(401);
+		res.end();
+
+		return;
+	}
+	if (!(await check_pwd(req.cookies.id, req.cookies.au4a83))) {
+		res.status(403);
+		res.end();
+
+		return;
+	}
+	if (!(await check_pwd(req.cookies.id, data.pwd))) {
+		res.status(402);
+		res.end();
+
+		return;
+	}
+
+	item_in_cart_model.findOneAndDelete({ owner_id: req.cookies.id }).then(() => {
+		product_model.findOneAndDelete({ owner: req.cookies.id }).then(() => {
+			user_model.findOneAndDelete({ id: req.cookies.id }).then(() => {
+				res.clearCookie("id", { path: "/" });
+				res.clearCookie("au4a83", { path: "/" });
+				res.clearCookie("name", { path: "/" });
+				res.clearCookie("shop_name", { path: "/" });
+
+				res.status(201);
+				res.end();
+			});
+		});
+	});
+});
+
 //give css
 app.get("/css", (req, res) => {
 	res.setHeader("Content-Type", "text/css");
@@ -1078,13 +1127,7 @@ app.get("/js/:filename/:id?", (req, res) => {
 							"{% DEFALUT_PRODUCTDES_INPUT_STR %}",
 							"{% DEFALUT_PRODUCTDET_INPUT_STR %}",
 						],
-						[
-							result[0].name,
-							result[0].price,
-							arr_to_str(result[0].hashtag),
-							result[0].description,
-							result[0].detail,
-						]
+						[result[0].name, result[0].price, arr_to_str(result[0].hashtag), result[0].description, result[0].detail]
 					);
 
 					res.writeHead(200, { "Content-Type": "text/javascript" });
