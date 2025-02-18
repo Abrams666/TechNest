@@ -20,7 +20,7 @@ app.use(express.static("uploads"));
 dotenv.config({ path: "./config.env" });
 
 const home_max_product_num = 20;
-const search_max_product_num = 2;
+const search_max_product_num = 100;
 
 //db connect
 const DCS = process.env.DATABASE_CONNECTION_STRING.replace("<db_password>", process.env.DATABASE_PASSWORD);
@@ -1153,6 +1153,11 @@ app.get("/js/:filename/:id?", (req, res) => {
 				id = "";
 			}
 			data = replacement(data, ["{% search_contain_str %}"], [id]);
+
+			res.writeHead(200, { "Content-Type": "text/javascript" });
+			res.end(data);
+		} else if (filename === "Setting") {
+			data = replacement(data, ["{% name %}", "{% shop %}"], [req.cookies.name, req.cookies.shop_name]);
 
 			res.writeHead(200, { "Content-Type": "text/javascript" });
 			res.end(data);

@@ -9,8 +9,8 @@ const app = Vue.createApp({
 			PASS_ERR: "",
 			WORD_ERR: "",
 			pwd: "",
-			name: "",
-			shop: "",
+			name: "{% name %}",
+			shop: "{% shop %}",
 			old_pwd: "",
 			new_pwd: "",
 			con_pwd: "",
@@ -32,16 +32,22 @@ const app = Vue.createApp({
 		},
 		change_pwd() {
 			this.change_pwd_window = true;
+			this.change_info_window = false;
+			this.delete_acc_window = false;
 		},
 		change_info() {
 			console.log(this.name);
 			console.log(this.shop);
 			if (this.name !== "" || this.shop !== "") {
 				this.change_info_window = true;
+				this.change_pwd_window = false;
+				this.delete_acc_window = false;
 			}
 		},
 		delete_acc() {
 			this.delete_acc_window = true;
+			this.change_pwd_window = false;
+			this.change_info_window = false;
 		},
 		check_pwd_close() {
 			this.change_pwd_window = false;
@@ -92,10 +98,7 @@ const app = Vue.createApp({
 
 						window.location.href = "/fail/Require Denied/403";
 					} else if (res.status === 201) {
-						this.change_pwd_window = false;
-						this.old_pwd = "";
-						this.new_pwd = "";
-						this.con_pwd = "";
+						window.location.href = "/setting";
 					}
 				});
 			}
@@ -144,8 +147,7 @@ const app = Vue.createApp({
 
 					window.location.href = "/fail/Require Denied/403";
 				} else if (res.status === 201) {
-					this.change_info_window = false;
-					this.info_pwd = "";
+					window.location.href = "/setting";
 				}
 			});
 		},
