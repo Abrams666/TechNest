@@ -1,4 +1,4 @@
-<h1>English Manual</h1>
+<h1>Manual</h1>
 <h3>TechNest</h3>
 <p>A website that you can sell and buy eletronic devices on it.</p>
 
