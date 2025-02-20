@@ -8,12 +8,12 @@
 
 <h4>2.Download and install NPM</h4>
 <p>NPM should be download and install while you install Node.js. Please follow the follow steps to set your environment variables.</p>
-<p>a.Open "Edit the system environment variables" in your computer.</p>
-<p>b.Choose "Advanced", then click "Environment Variables"</p>
-<p>c.Choose the secion called "PATH" in the above box.</p>
-<p>d.Click "Edit".</p>
-<p>f.Add a new line "C:\Program Files\nodejs\" in it.</p>
-<p>g. Reboot your computer.</p>
+<code>a.Open "Edit the system environment variables" in your computer.
+b.Choose "Advanced", then click "Environment Variables"
+c.Choose the secion called "PATH" in the above box.
+d.Click "Edit".
+f.Add a new line "C:\Program Files\nodejs\" in it.
+g. Reboot your computer.</code>
 <p>Then type the following code in PowerShell to make npm can be run on VScode.</p>
 <code>get-executionpolicy
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>
