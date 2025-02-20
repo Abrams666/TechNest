@@ -23,7 +23,7 @@ const home_max_product_num = 20;
 const search_max_product_num = 100;
 
 //db connect
-const DCS = process.env.DATABASE_CONNECTION_STRING.replace("<db_password>", process.env.DATABASE_PASSWORD);
+const DCS = process.env.DATABASE_CONNECTION_STRING.replace("{db_password}", process.env.DATABASE_PASSWORD);
 mongoose
 	.connect(DCS, {
 		useNewUrlParser: true,

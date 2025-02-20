@@ -22,7 +22,7 @@
 <code>
 PORT = "80"
 DATABASE_PASSWORD = "[PASSWORD OF YOUR DATABASE]"
-DATABASE_CONNECTION_STRING = "mongodb+srv://[NAME OF YOUR ACCOUNT]:<db_password>@cluster0.siulj.mongodb.net/[NAME OF YOUR DATABASE]?retryWrites=true&w=majority&appName=Cluster0"
+DATABASE_CONNECTION_STRING = "mongodb+srv://[NAME OF YOUR ACCOUNT]:{db_password}@cluster0.siulj.mongodb.net/[NAME OF YOUR DATABASE]?retryWrites=true&w=majority&appName=Cluster0"
 </code>
 
 <h4>6.Run these codes</h4>
@@ -37,4 +37,4 @@ DATABASE_CONNECTION_STRING = "mongodb+srv://[NAME OF YOUR ACCOUNT]:<db_password>
 <h1>Copyright Notice </h1>
 <p>This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International.</p>
 <p>To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/</p>
-<p>Copyright © 2024 TechNest(陳元謙Abrams666) All Rights Reserved</p>
+<p>Copyright © 2025 TechNest(陳元謙Abrams666) All Rights Reserved</p>
