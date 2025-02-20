@@ -7,23 +7,29 @@
 <p>Visit "https://nodejs.org/" to download Node.js, then follow the step to install it.</p>
 
 <h4>2.Download and install NPM</h4>
-<p>NPM should be download and install while you install Node.js. Please type the following code in commander to make npm can be run on VScode.</p>
-<code></code>
+<p>NPM should be download and install while you install Node.js. Please follow the follow steps to set your environment variables.</p>
+<p>a.Open "Edit the system environment variables" in your computer.</p>
+<p>b.Choose "Advanced", then click "Environment Variables"</p>
+<p>c.Choose the secion called "PATH" in the above box.</p>
+<p>d.Click "Edit".</p>
+<p>f.Add a new line "C:\Program Files\nodejs\" in it.</p>
+<p>g. Reboot your computer.</p>
+<p>Then type the following code in PowerShell to make npm can be run on VScode.</p>
+<code>get-executionpolicy
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>
 
 <h4>3.Sign up in MongoDB</h4>
 <p>Visit "https://www.mongodb.com/" to sign up and set up your Database.<p>
 
 <h4>4.Download or clone these codes</h4>
 <p>Your can clone these codes if you have git or download them manually. Then Open them with VScode(recommanded).<p>
-<code></code>
+<code>git clone https://github.com/Abrams666/TechNest</code>
 
 <h4>5.Config</h4>
 <p>Add a document called "config.env" in the file. And the contain should be:</p>
-<code>
-PORT = "80"
+<code>PORT = "80"
 DATABASE_PASSWORD = "[PASSWORD OF YOUR DATABASE]"
-DATABASE_CONNECTION_STRING = "mongodb+srv://[NAME OF YOUR ACCOUNT]:{db_password}@cluster0.siulj.mongodb.net/[NAME OF YOUR DATABASE]?retryWrites=true&w=majority&appName=Cluster0"
-</code>
+DATABASE_CONNECTION_STRING = "mongodb+srv://[NAME OF YOUR ACCOUNT]:{db_password}@cluster0.siulj.mongodb.net/[NAME OF YOUR DATABASE]?retryWrites=true&w=majority&appName=Cluster0"</code>
 
 <h4>6.Run these codes</h4>
 <p>Type the following code in commander to start the server.</p>
