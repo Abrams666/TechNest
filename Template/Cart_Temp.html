@@ -1,82 +1,90 @@
 <!DOCTYPE html>
 <html>
-    <head lang="en">
-        <title>TechNest</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="/css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
-    <body>
-        <header>
-            <a href="/">
-                <img src="" alt="" />
-                <h1 class="title_h1">Tech</h1>
-                <h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
-            </a>
-            <nav>
-                <ul>
-                    <li>
-                        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
-                    </li>
-                    <li>
-                        <a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-                    </li>
-                    <li>
-                        <a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
-                    </li>
-                    <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
-                </ul>
-            </nav>
-        </header>
-        <main>
-            <section id="cart_secId">
-                <form id="cart_formId">
-                    <div id="cart_divId">{% ITEM %}</div>
-                    <button id="pay_btnId" v-on:click.prevent="pay()">Pay bill</button>
-                </form>
-            </section>
-        </main>
-        <footer>
-            <div id="footer_div1_1">
-                <div class="footer_div2">
-                    <p>Pages</p>
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/cart">Cart</a></li>
-                        <li><a href="/myshop">MyShop</a></li>
-                    </ul>
-                </div>
-                <div class="footer_div2">
-                    <p>Account</p>
-                    <ul>
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/signup">Sign Up</a></li>
-                        <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
-                    </ul>
-                </div>
-                <div class="footer_div2">
-                    <p>Contact</p>
-                    <ul>
-                        <li><a href="https://www.facebook.com/profile.php?id=100014458966012&locale=zh_TW">Facebook</a></li>
-                        <li><a href="https://www.instagram.com/abrams_66/">Instagram</a></li>
-                        <li>Email:service@technest.com</li>
-                        <li>Phone:(+886)000000000</li>
-                    </ul>
-                </div>
-                <div class="footer_div2">
-                    <p>Other</p>
-                    <ul>
-                        <li><a href="#Policy">Policy</a></li>
-                        <li><a href="https://github.com/Abrams666/TechNest">Source</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div id="footer_div1_2">
-                <p>Copyright© 2025 TechNest. All rights reserved.</p>
-            </div>
-        </footer>
-        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
-        <script src="/js/Cart"></script>
-    </body>
+	<head lang="en">
+		<title>TechNest</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+			integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+	</head>
+	<body>
+		<header>
+			<a href="/">
+				<img src="" alt="" />
+				<h1 class="title_h1">Tech</h1>
+				<h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
+			</a>
+			<input type="checkbox" id="checkk" />
+			<label for="checkk" id="checkkk"><i class="fa-solid fa-bars"></i></label>
+			<nav>
+				<ul>
+					<li>
+						<a href="/"><i class="fa-solid fa-house"></i> Home</a>
+					</li>
+					<li>
+						<a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+					</li>
+					<li>
+						<a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
+					</li>
+					<li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+				</ul>
+			</nav>
+		</header>
+		<main>
+			<section id="cart_secId">
+				<form id="cart_formId">
+					<div id="cart_divId">{% ITEM %}</div>
+					<button id="pay_btnId" v-on:click.prevent="pay()">Pay bill</button>
+				</form>
+			</section>
+		</main>
+		<footer>
+			<div id="footer_div1_1">
+				<div class="footer_div2">
+					<p>Pages</p>
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li><a href="/cart">Cart</a></li>
+						<li><a href="/myshop">MyShop</a></li>
+					</ul>
+				</div>
+				<div class="footer_div2">
+					<p>Account</p>
+					<ul>
+						<li><a href="/login">Login</a></li>
+						<li><a href="/signup">Sign Up</a></li>
+						<li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+					</ul>
+				</div>
+				<div class="footer_div2">
+					<p>Contact</p>
+					<ul>
+						<li><a href="https://www.facebook.com/profile.php?id=100014458966012&locale=zh_TW">Facebook</a></li>
+						<li><a href="https://www.instagram.com/abrams_66/">Instagram</a></li>
+						<li>Email:service@technest.com</li>
+						<li>Phone:(+886)000000000</li>
+					</ul>
+				</div>
+				<div class="footer_div2 hind">
+					<p>Other</p>
+					<ul>
+						<li><a href="#Policy">Policy</a></li>
+						<li><a href="https://github.com/Abrams666/TechNest">Source</a></li>
+					</ul>
+				</div>
+			</div>
+			<div id="footer_div1_2">
+				<p>Copyright© 2025 TechNest. All rights reserved.</p>
+			</div>
+		</footer>
+		<script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+		<script src="/js/Cart"></script>
+	</body>
 </html>

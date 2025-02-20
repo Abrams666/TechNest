@@ -1,84 +1,92 @@
 <!DOCTYPE html>
 <html>
-    <head lang="en">
-        <title>TechNest</title>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="/css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
-    <body>
-        <header>
-            <a href="/">
-                <img src="" alt="" />
-                <h1 class="title_h1">Tech</h1>
-                <h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
-            </a>
-            <nav>
-                <ul>
-                    <li>
-                        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
-                    </li>
-                    <li>
-                        <a href="cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
-                    </li>
-                    <li>
-                        <a href="myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
-                    </li>
-                    <li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
-                </ul>
-            </nav>
-        </header>
-        <main>
-            <section id="signup_section">
-                <div id="signup_div">
-                    <div id="signup_div2">
-                        <h2>Sign Up</h2>
-                        <div></div>
-                    </div>
-                    <form id="signup_form">
-                        <div class="accpwdsec1">
-                            <div class="accpwdsec2">
-                                <h5>Email</h5>
-                                <p class="err_text">{{ ACCOUNT_ERR }}</p>
-                            </div>
-                            <input type="text" v-model="acc" />
-                        </div>
-                        <div class="accpwdsec1">
-                            <div class="accpwdsec2">
-                                <h5>Password</h5>
-                                <p class="err_text">{{ PASSWORD_ERR }}</p>
-                            </div>
-                            <input type="password" v-model="pwd" />
-                        </div>
-                        <div class="accpwdsec1">
-                            <div class="accpwdsec2">
-                                <h5>Confirm Password</h5>
-                                <p class="err_text">{{ CONFIRM_PASSWORD_ERR }}</p>
-                            </div>
-                            <input type="password" v-model="con" v-on:input="confirm_password()" />
-                        </div>
-                        <div class="accpwdsec1">
-                            <div class="accpwdsec2">
-                                <h5>Your Name</h5>
-                                <p class="err_text">{{ NAME_ERR }}</p>
-                            </div>
-                            <input type="text" v-model="name" v-on:input="update_shop_name()" />
-                        </div>
-                        <div class="accpwdsec1">
-                            <div class="accpwdsec2">
-                                <h5>Shop Name</h5>
-                                <p class="err_text">{{ SHOP_NAME_ERR }}</p>
-                            </div>
-                            <input type="text" v-model="shop" v-on:input="shop_click()" />
-                        </div>
-                        <button v-on:click.prevent="signup">Submit</button>
-                        <a href="/login">Already have a account? Login here!</a>
-                    </form>
-                </div>
-            </section>
-        </main>
-        <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
-        <script src="/js/Signup"></script>
-    </body>
+	<head lang="en">
+		<title>TechNest</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="/css" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+			integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+	</head>
+	<body>
+		<header>
+			<a href="/">
+				<img src="" alt="" />
+				<h1 class="title_h1">Tech</h1>
+				<h1 class="title_h1" style="color: rgb(1, 215, 1)">Nest</h1>
+			</a>
+			<input type="checkbox" id="checkk" />
+			<label for="checkk" id="checkkk"><i class="fa-solid fa-bars"></i></label>
+			<nav>
+				<ul>
+					<li>
+						<a href="/"><i class="fa-solid fa-house"></i> Home</a>
+					</li>
+					<li>
+						<a href="/cart"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+					</li>
+					<li>
+						<a href="/myshop"><i class="fa-solid fa-shop"></i> MyShop</a>
+					</li>
+					<li><a href="{% SETTINGORLOGIN %}">{% USER %}</a></li>
+				</ul>
+			</nav>
+		</header>
+		<main>
+			<section id="signup_section">
+				<div id="signup_div">
+					<div id="signup_div2">
+						<h2>Sign Up</h2>
+						<div></div>
+					</div>
+					<form id="signup_form">
+						<div class="accpwdsec1">
+							<div class="accpwdsec2">
+								<h5>Email</h5>
+								<p class="err_text">{{ ACCOUNT_ERR }}</p>
+							</div>
+							<input type="text" v-model="acc" />
+						</div>
+						<div class="accpwdsec1">
+							<div class="accpwdsec2">
+								<h5>Password</h5>
+								<p class="err_text">{{ PASSWORD_ERR }}</p>
+							</div>
+							<input type="password" v-model="pwd" />
+						</div>
+						<div class="accpwdsec1">
+							<div class="accpwdsec2">
+								<h5>Confirm Password</h5>
+								<p class="err_text">{{ CONFIRM_PASSWORD_ERR }}</p>
+							</div>
+							<input type="password" v-model="con" v-on:input="confirm_password()" />
+						</div>
+						<div class="accpwdsec1">
+							<div class="accpwdsec2">
+								<h5>Your Name</h5>
+								<p class="err_text">{{ NAME_ERR }}</p>
+							</div>
+							<input type="text" v-model="name" v-on:input="update_shop_name()" />
+						</div>
+						<div class="accpwdsec1">
+							<div class="accpwdsec2">
+								<h5>Shop Name</h5>
+								<p class="err_text">{{ SHOP_NAME_ERR }}</p>
+							</div>
+							<input type="text" v-model="shop" v-on:input="shop_click()" />
+						</div>
+						<button v-on:click.prevent="signup">Submit</button>
+						<a href="/login">Already have a account? Login here!</a>
+					</form>
+				</div>
+			</section>
+		</main>
+		<script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+		<script src="/js/Signup"></script>
+	</body>
 </html>
