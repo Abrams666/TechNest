@@ -40,7 +40,7 @@ DATABASE_CONNECTION_STRING = "mongodb+srv://[NAME OF YOUR ACCOUNT]:{db_password}
 <h4>6.Test</h4>
 <p>Type "localhost" or "127.0.0.1" in your browser.</p>
 
-<h1>Copyright Notice </h1>
+<h1>©Copyright Notice </h1>
 <p>This work is licensed under Creative Commons Attribution-NonCommercial 4.0 International.</p>
 <p>To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/</p>
 <p>Copyright © 2025 TechNest(陳元謙Abrams666) All Rights Reserved</p>
