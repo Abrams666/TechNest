@@ -837,11 +837,9 @@ app.post("/editdata", async (req, res) => {
 									`${result[0].id + 1}N${i + 1}${path.extname(uploaded_imgArr[i].originalFilename)}`
 								);
 
-								exts.push(
-									path.extname(uploaded_imgArr[i].originalFilename).toString()[1] +
-										path.extname(uploaded_imgArr[i].originalFilename).toString()[2] +
-										path.extname(uploaded_imgArr[i].originalFilename).toString()[3]
-								);
+								//console.log(path.extname(uploaded_imgArr[i].originalFilename));
+
+								exts.push(path.extname(uploaded_imgArr[i].originalFilename).toString());
 
 								fs.rename(oldPath, newPath, () => {});
 							}
@@ -1189,9 +1187,13 @@ app.get("/img/user/:id", (req, res) => {
 app.get("/img/pro/:id/:num/:type", (req, res) => {
 	const id = req.params.id;
 	const num = req.params.num;
-	const type = req.params.type;
+	let type = req.params.type;
 
-	fs.readFile(`./Database/Product_Picture/${id}N${num}.${type}`, (err, data) => {
+	// for (let i = 1; i < req.params.type.toString().length; i++) {
+	// 	type = type + req.params.type.toString()[i];
+	// }
+
+	fs.readFile(`./Database/Product_Picture/${id}N${num}${type}`, (err, data) => {
 		res.writeHead(200, { "Content-Type": "image/jpg" });
 		res.end(data);
 	});
